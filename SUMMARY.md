@@ -6,6 +6,7 @@
    * [Data](language_specification/data.md)
    * [Query](language_specification/query.md)
        * [Search Criteria](language_specification/search_criteria.md)
+           * [Field Comparisons with Arrays](language_specification/field_comparisons_with_arrays.md)
        * [Projection](language_specification/projection.md)
        * [Sort](language_specification/sort.md)
        * [Update](language_specification/update.md)
