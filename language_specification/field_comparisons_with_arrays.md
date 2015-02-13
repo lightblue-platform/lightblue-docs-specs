@@ -55,7 +55,7 @@ This expression is true when any of the following is true:
 ```
 
 This expression is true when all of the following are true:
-* `array1.length <= array2.length`
+* both array fields are of the same length
 * for `i` between `0` and the array length - 1
     * `array1[i] < array2[i]`
 
@@ -70,7 +70,7 @@ This expression is true when all of the following are true:
 ```
 
 This expression is true when all of the following are true:
-* `array1.length >= array2.length`
+* both array fields are of the same length
 * for `i` between `0` and the array length - 1
     * `array1[i] > array2[i]`
 
@@ -85,7 +85,7 @@ This expression is true when all of the following are true:
 ```
 
 This expression is true when all of the following are true:
-* length of `array1` is less than or equal to length of `array2`
+* both array fields are of the same length
 * for `i` between `0` and the array length - 1
     * `array1[i] <= array2[i]`
 
@@ -100,6 +100,6 @@ This expression is true when all of the following are true:
 ```
 
 This expression is true when all of the following are true:
-* length of `array1` is greater than or equal to length of `array2`
+* both array fields are of the same length
 * for `i` between `0` and the array length - 1
     * `array1[i] >= array2[i]`
