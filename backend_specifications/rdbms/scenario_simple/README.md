@@ -2,7 +2,7 @@
 
 Single RDBMS table maps to lightblue metadata with only simple data types.
 
-## Oracle Schema
+## Schema: Oracle
 ```sql
 Create Table MY_TABLE (
   MY_RAW RAW(1024),
@@ -28,7 +28,7 @@ Create Table MY_TABLE (
 );
 ```
 
-## Lightblue Metadata
+## Schema: lightblue
 ```json
 {
     "entityInfo": {

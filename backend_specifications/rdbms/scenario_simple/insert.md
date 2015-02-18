@@ -42,5 +42,5 @@ VALUES (to_date('20150217 222100', 'YYYYMMDD HH24MISS'), 123456, 'hi there');
             "varchar2": "hi there"
         }
     ]
-}  
+}
 ```
