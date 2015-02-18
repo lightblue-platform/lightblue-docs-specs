@@ -46,7 +46,7 @@
                * [save](backend_specifications/rdbms/scenario_simple/save.md)
                * [find](backend_specifications/rdbms/scenario_simple/find.md)
                * [delete](backend_specifications/rdbms/scenario_simple/delete.md)
-           * [Scenario: 2D Array](backend_specifications/rdbms/scenario_2d_array/README.md)
+           * [Scenario: Arrays](backend_specifications/rdbms/scenario_arrays/README.md)
            * [Scenario: Dilution](backend_specifications/rdbms/scenario_dilution/README.md)
            * [Scenario: Merge](backend_specifications/rdbms/scenario_merge/README.md)
    * [LDAP](backend_specifications/ldap/README.md)
