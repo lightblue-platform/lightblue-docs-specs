@@ -26,6 +26,7 @@ POST /data/update/myMetadata/0.1.0
     ]
 }
 ```
+
 ## generated SQL
 ```sql
 UPDATE MY_TABLE
