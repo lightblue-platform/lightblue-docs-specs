@@ -244,26 +244,23 @@ POST /data/save/arrayNoPk/0.1.0
 }
 ```
 ## generated SQL
+Comments indicate logic lightblue would be handling.
 ```sql
+/* Delete records that should no longer exist */
 DELETE FROM ARRAY_STRING_WITHOUT_PK
 WHERE BASE_ID=123456
 AND S_FIELD NOT IN ('one', 'apple', 'three', 'banana');
 
+/* Find all records that already exist */
+SELECT *
+FROM ARRAY_STRING_WIHOUT_PK
+WHERE BASE_ID=123456;
+
+/* for each record not in the database insert it */
 INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
-WITH VALUE_LIST AS (
-    SELECT 'one' as S_FIELD FROM DUAL
-    UNION
-    SELECT 'apple' as S_FIELD FROM DUAL
-    UNION
-    SELECT 'three' as S_FIELD FROM DUAL
-    UNION
-    SELECT 'banana' as S_FIELD FROM DUAL
-)
-SELECT 123456, B.S_FIELD
-FROM ARRAY_STRING_WITHOUT_PK A,
-VALUE_LIST B
-WHERE A.S_FIELD(+)=B.S_FIELD
-AND A.S_FIELD IS NULL;
+VALUES (123456, 'apple');
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+VALUES (123456, 'banana');
 ```
 
 ## lightblue response
