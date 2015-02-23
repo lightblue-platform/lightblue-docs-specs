@@ -1,6 +1,16 @@
 # Scenario: Simple
-
 Single RDBMS table maps to lightblue metadata with only simple data types.
+
+**Goal**: Show basic operations with a very simple scenario
+
+* [Setup](#setup)
+* [insert](#insert)
+* [update](#update)
+* [save](#save)
+* [find](#find)
+* [delete](#delete)
+
+# Setup
 
 ## Schema: Oracle
 ```sql
@@ -201,5 +211,241 @@ Create Table MY_TABLE (
             }
         }
     }
+}
+```
+
+# insert
+
+## lightblue request
+```
+PUT /data/insert/myMetadata/0.1.0
+```
+```json
+{
+    "objectType": "myMetadata",
+    "version": "0.1.0",
+    "data": [
+        {
+            "date": "20150217 1721000000-0500",
+            "number": "123456",
+            "varchar2": "hi there"
+        }
+    ],
+    "projection": [
+        {
+            "field": "*",
+            "include": true
+        }
+    ]
+}
+```
+## generated SQL
+```sql
+INSERT INTO MY_TABLE (MY_DATE, MY_NUMBER, MY_VARCHAR2)
+VALUES (to_date('20150217 222100', 'YYYYMMDD HH24MISS'), 123456, 'hi there');
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+   "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "date": "20150217 222100",
+            "number": "123456",
+            "varchar2": "hi there"
+        }
+    ]
+}
+```
+
+# update
+
+## lightblue request
+```
+POST /data/update/myMetadata/0.1.0
+```
+```json
+{
+    "objectType": "myMetadata",
+    "version": "0.1.0",
+    "query": {
+        "field": "number",
+        "op": "=",
+        "value": "123456"
+    },
+    "update": {
+        "$set": {
+            "char": "boo!"
+        }
+    },
+    "projection": [
+        {
+            "field": "*",
+            "include": true
+        }
+    ]
+}
+```
+
+## generated SQL
+```sql
+UPDATE MY_TABLE
+SET MY_CHAR='boo!'
+WHERE MY_NUMBER = 123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "date": "20150217 222100",
+            "number": "123456",
+            "varchar2": "hi there",
+            "char": "boo!"
+        }
+    ]
+}
+```
+
+# save
+
+## lightblue request
+```
+POST /data/save/myMetadata/0.1.0
+```
+```json
+{
+    "objectType": "myMetadata",
+    "version": "0.1.0",
+    "data": [
+        {
+            "date": "20150217 1721000000-0500",
+            "number": "123456",
+            "varchar2": "hi there",
+            "char": "boo!",
+            "long": "A long time ago in a galaxy far, far away...."
+        }
+    ],
+    "projection": [
+        {
+            "field": "*",
+            "include": true
+        }
+    ]
+}
+```
+## generated SQL
+```sql
+UPDATE MY_TABLE
+SET MY_DATE=to_date('20150217 222100', 'YYYYMMDD HH24MISS'),
+MY_VARCHAR2='hi there',
+MY_CHAR='boo!',
+MY_LONG='A long time ago in a galaxy far, far away....'
+WHERE MY_NUMBER = 123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "date": "20150217 222100",
+            "number": "123456",
+            "varchar2": "hi there",
+            "char": "boo!",
+            "long": "A long time ago in a galaxy far, far away...."
+        }
+    ]
+}
+```
+
+# find
+
+## lightblue request
+```
+POST /data/find/myMetadata/0.1.0
+```
+```json
+{
+    "objectType": "myMetadata",
+    "version": "0.1.0",
+    "query": {
+        "field": "number",
+        "op": "=",
+        "rvalue": "123456"
+    },
+    "projection": [
+        {
+            "field": "*",
+            "include": true
+        }
+    ]
+}
+```
+
+## generated SQL
+```sql
+SELECT *
+FROM MY_TABLE
+WHERE MY_NUMBER=123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "matchCount": 1,
+    "processed": [
+        {
+            "date": "20150217 222100",
+            "number": "123456",
+            "varchar2": "hi there",
+            "char": "boo!",
+            "long": "A long time ago in a galaxy far, far away...."
+        }
+    ]
+}
+```
+
+# delete
+
+## lightblue request
+```
+POST /data/delete/myMetadata/0.1.0
+```
+```json
+{
+    "objectType": "myMetadata",
+    "version": "0.1.0",
+    "query": {
+        "field": "number",
+        "op": "=",
+        "rvalue": "123456"
+    }
+}
+```
+
+## generated SQL
+```sql
+DELETE FROM MY_TABLE
+WHERE MY_NUMBER=123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1
 }
 ```

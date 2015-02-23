@@ -1,5 +1,8 @@
-# Scenario: Array without PK
+# Scenario: Array - No PK
 This example uses just a single field as examples in each table.  Details for simple data type mappings are captured in the "Simple" scenario and in the "Field Mappings" sections.
+
+## Goal
+Show operations against a simple array where the array's underlying table does not have a primary key.  Note that for this scenario the primary key of the base entity is required to be supplied by the client, simplifying things a bit.
 
 ## Schema: Oracle
 ```sql

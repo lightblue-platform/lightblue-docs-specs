@@ -1,4 +1,4 @@
-# Scenario: Array with PK
+# Scenario: Array - PK
 This example uses just a single field as examples in each table.  Details for simple data type mappings are captured in the "Simple" scenario and in the "Field Mappings" sections.
 
 ## Schema: Oracle
