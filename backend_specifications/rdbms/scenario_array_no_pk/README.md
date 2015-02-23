@@ -1,8 +1,17 @@
 # Scenario: Array - No PK
 This example uses just a single field as examples in each table.  Details for simple data type mappings are captured in the "Simple" scenario and in the "Field Mappings" sections.
 
-## Goal
-Show operations against a simple array where the array's underlying table does not have a primary key.  Note that for this scenario the primary key of the base entity is required to be supplied by the client, simplifying things a bit.
+**Goal**: Show how an array of simple types works when the array values do not have a primary key.
+
+**Contents**:
+* [Setup](#setup)
+* [insert](#insert)
+* [update](#update)
+* [save](#save)
+* [find](#find)
+* [delete](#delete)
+
+# Setup
 
 ## Schema: Oracle
 ```sql
@@ -74,5 +83,298 @@ Create Table ARRAY_STRING_WITHOUT_PK (
             }
         }
     }
+}
+```
+
+# insert
+
+## lightblue request
+```
+PUT /data/insert/arrayNoPk/0.1.0
+```
+```json
+{
+    "objectType": "arrayNoPk",
+    "version": "0.1.0",
+    "data": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "two",
+                "three"
+            ]
+        }
+    ],
+    "projection": [
+        {
+            "field": "*",
+            "recursive": true,
+            "include": true
+        }
+    ]
+}
+```
+## generated SQL
+```sql
+INSERT INTO BASE (ID, A_FIELD)
+VALUES (123456, 'b');
+
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+VALUES (123456, 'one');
+
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+VALUES (123456, 'two');
+
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+VALUES (123456, 'three');
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+   "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "two",
+                "three"
+            ]
+        }
+    ]
+}
+```
+
+# update
+Append a value to the array.
+
+## lightblue request
+```
+POST /data/update/arrayNoPk/0.1.0
+```
+```json
+{
+    "objectType": "arrayNoPk",
+    "version": "0.1.0",
+    "query": {
+        "field": "id",
+        "op": "=",
+        "value": "123456"
+    },
+    "update": {
+        "$append": {
+            "arrayStringWithoutPk": [
+                "four"
+            ]
+        }
+    },
+    "projection": [
+        {
+            "field": "*",
+            "recursive": true,
+            "include": true
+        }
+    ]
+}
+```
+
+## generated SQL
+```sql
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+VALUES (123456, 'four');
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "two",
+                "three",
+                "four"
+            ]
+        }
+    ]
+}
+```
+
+# save
+Change some of array contents.
+
+## lightblue request
+```
+POST /data/save/arrayNoPk/0.1.0
+```
+```json
+{
+    "objectType": "arrayNoPk",
+    "version": "0.1.0",
+    "data": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "apple",
+                "three",
+                "banana"
+            ]
+        }
+    ],
+    "projection": [
+        {
+            "field": "*",
+            "recursive": true,
+            "include": true
+        }
+    ]
+}
+```
+## generated SQL
+```sql
+DELETE FROM ARRAY_STRING_WITHOUT_PK
+WHERE BASE_ID=123456
+AND S_FIELD NOT IN ('one', 'apple', 'three', 'banana');
+
+INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
+WITH VALUE_LIST AS (
+    SELECT 'one' as S_FIELD FROM DUAL
+    UNION
+    SELECT 'apple' as S_FIELD FROM DUAL
+    UNION
+    SELECT 'three' as S_FIELD FROM DUAL
+    UNION
+    SELECT 'banana' as S_FIELD FROM DUAL
+)
+SELECT 123456, B.S_FIELD
+FROM ARRAY_STRING_WITHOUT_PK A,
+VALUE_LIST B
+WHERE A.S_FIELD(+)=B.S_FIELD
+AND A.S_FIELD IS NULL;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1,
+    "processed": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "apple",
+                "three",
+                "banana"
+            ]
+        }
+    ]
+}
+```
+
+# find
+
+## lightblue request
+```
+POST /data/find/arrayNoPk/0.1.0
+```
+```json
+{
+    "objectType": "arrayNoPk",
+    "version": "0.1.0",
+    "query": {
+        "field": "id",
+        "op": "=",
+        "rvalue": "123456"
+    },
+    "projection": [
+        {
+            "field": "*",
+            "recursive": true,
+            "include": true
+        }
+    ]
+}
+```
+
+## generated SQL
+```sql
+SELECT *
+FROM BASE
+WHERE ID=123456;
+
+SELECT *
+FROM ARRAY_STRING_WITHOUT_PK
+WHERE BASE_ID=123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "matchCount": 1,
+    "processed": [
+        {
+            "id": "123456",
+            "a": "b",
+            "arrayStringWithoutPk": [
+                "one",
+                "apple",
+                "three",
+                "banana"
+            ]
+        }
+    ]
+}
+```
+
+# delete
+
+## lightblue request
+```
+POST /data/delete/arrayNoPk/0.1.0
+```
+```json
+{
+    "objectType": "arrayNoPk",
+    "version": "0.1.0",
+    "query": {
+        "field": "id",
+        "op": "=",
+        "rvalue": "123456"
+    }
+}
+```
+
+## generated SQL
+```sql
+DELETE FROM ARRAY_STRING_WITHOUT_PK
+WHERE BASE_ID=123456;
+
+DELETE FROM BASE
+WHERE ID=123456;
+```
+
+## lightblue response
+```json
+{
+    "status": "complete",
+    "modifiedCount": 1,
+    "matchCount": 1
 }
 ```

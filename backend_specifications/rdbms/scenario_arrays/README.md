@@ -6,6 +6,8 @@ This combines a few array based scenarios:
 
 This example uses just a single field as examples in each table.  Details for simple data type mappings are captured in the "Simple" scenario and in the "Field Mappings" sections.
 
+# Setup
+
 ## Schema: Oracle
 ```sql
 Create Table BASE (

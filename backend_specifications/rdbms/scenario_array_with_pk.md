@@ -1,6 +1,18 @@
 # Scenario: Array - PK
 This example uses just a single field as examples in each table.  Details for simple data type mappings are captured in the "Simple" scenario and in the "Field Mappings" sections.
 
+**Goal**: Show how an array of simple types works when the array values have a primary key.
+
+**Contents**:
+* [Setup](#setup)
+* [insert](#insert)
+* [update](#update)
+* [save](#save)
+* [find](#find)
+* [delete](#delete)
+
+# Setup
+
 ## Schema: Oracle
 ```sql
 Create Table BASE (

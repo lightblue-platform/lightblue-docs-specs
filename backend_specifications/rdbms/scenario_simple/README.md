@@ -3,6 +3,7 @@ Single RDBMS table maps to lightblue metadata with only simple data types.
 
 **Goal**: Show basic operations with a very simple scenario
 
+**Contents**:
 * [Setup](#setup)
 * [insert](#insert)
 * [update](#update)
