@@ -84,7 +84,7 @@ Update field x.y.z. x and y are objects and z is a value.
 ---
 
 ```javascript
-{ "$unset" : "x.y." }
+{ "$unset" : "x.y.z" }
 ```
 Remove x.y.z from doc.
 * x and y are objects.

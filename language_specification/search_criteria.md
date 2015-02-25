@@ -14,9 +14,9 @@ relational_expression := binary_relational_expression |
 
 binary_relational_expression := field_comparison_expression |
                                 value_comparison_expression
-field_comparison_expression := { "field": <field>,
+field_comparison_expression := { "field": <field or array>,
                                  op: binary_comparison_operator,
-                                 "rfield": <field> }
+                                 "rfield": <field or array> }
 value_comparison_expression := { "field": <field>,
                                  op: binary_comparison_operator,
                                  rvalue: <value> }
@@ -28,12 +28,12 @@ nary_relational_expression := nary_value_relational_expression |
 
 nary_value_relational_expression := { "field": <field>,
                                        op: nary_comparison_operator,
-                                       values: value_list_array } 
+                                       values: value_list_array }
 
 nary_field_relational_expression := { "field": <field>,
                                        op: nary_comparison_operator,
-                                       "rfield": <array_field> } 
-                              
+                                       "rfield": <array_field> }
+
 nary_comparison_operator := "$in" "$not_in" "$nin"
 
 regex_match_expression := { "field": <field>, regex: <pattern>,
@@ -51,7 +51,10 @@ array_match_expression := { array: <field>,
                             elemMatch: query_expression }
 value_list_array := [ value1, value2, ... ]
 ```
-Examples:
+
+
+
+### Examples
 
 Search documents with login=someuser:
 ```javascript

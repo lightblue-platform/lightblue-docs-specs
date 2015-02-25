@@ -11,8 +11,8 @@ Schemas for the mongo backend are managed by lightblue.  Therefore it's importan
 | date      |String| format: YYYYMMDD HHmmssSSSS+-ZZZZ|
 | integer   | 64-bit integer | |
 | double    | Double | |
-| biginteger| String | don't allow < > operators during search |
-| bigdecimal| String |don't allow < > operators during search |
+| biginteger| String | operators < and > not allowed during search |
+| bigdecimal| String | operators < and > not allowed during search |
 | string    | String | |
 | uid       |String |  |
 | object | Object | |
