@@ -11,6 +11,8 @@
        * [Sort](language_specification/sort.md)
        * [Update](language_specification/update.md)
    * [Error](language_specification/error.md)
+   * [MongoDB](language_specification/mongodb)
+       * [Metadata](language_specification/mongodb/metadata.md)
    * [RDBMS](language_specification/rdbms.md)
    * [LDAP](language_specification/ldap.md)
        * [Configure](language_specification/ldap/configure.md)
