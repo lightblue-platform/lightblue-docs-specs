@@ -41,6 +41,7 @@
            * [Data Types](backend_specifications/rdbms/data_types.md)
            * [Data Structures](backend_specifications/rdbms/data_structures.md)
            * [Field Mappings](backend_specifications/rdbms/field_mappings.md)
+           * [Metadata Notes](backend_specifications/rdbms/metadata_notes.md)
            * [Scenario: Simple](backend_specifications/rdbms/scenario_simple.md)
            * [Scenario: PK Generation by DB](backend_specifications/rdbms/scenario_pk_generation.md)
            * [Scenario: PK Generation by Sequence](backend_specifications/rdbms/scenario_pk_generation_by_sequence.md)

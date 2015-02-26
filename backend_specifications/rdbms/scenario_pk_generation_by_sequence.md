@@ -51,6 +51,24 @@ Create Table SUB_DOCUMENT (
         "version": {
             "value": "0.1.0"
         },
+        "rdbms": {
+            "table": "BASE",
+            "primaryKeys": [
+                {
+                    "table": "BASE",
+                    "columns": ["ID"]
+                }
+            ],
+            "foreignKeys": [
+                {
+                    "table": "SUB_DOCUMENT",
+                    "columns": ["BASE_ID"],
+                    "references": {
+                        "table": "BASE",
+                        "columns": ["ID"]
+                }
+            ]
+        },
         "fields": {
             "id": {
                 "type": "integer",

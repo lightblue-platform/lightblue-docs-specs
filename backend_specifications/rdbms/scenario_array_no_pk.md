@@ -47,6 +47,25 @@ Create Table ARRAY_STRING_WITHOUT_PK (
         "version": {
             "value": "0.1.0"
         },
+        "rdbms": {
+            "table": "BASE",
+            "primaryKeys": [
+                {
+                    "table": "BASE",
+                    "columns": ["ID"]
+                }
+            ],
+            "foreignKeys": [
+                {
+                    "table": "ARRAY_STRING_WITHOUT_PK",
+                    "columns": ["BASE_ID"],
+                    "notNull": true,
+                    "references": {
+                        "table": "BASE",
+                        "columns": ["ID"]
+                }
+            ]
+        },
         "fields": {
             "id": {
                 "type": "integer",
