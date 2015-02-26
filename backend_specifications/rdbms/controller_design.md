@@ -39,10 +39,8 @@ fieldName : {
   rdbms: {
       table: tableName,
       column: columnName,
-      insert: <expression to be used in insert statement, such as upper(?)> defaults to ?
-      update: <expression to be used in SET clause> defaults to tableName.columnName=?
-      select: <expression to be used in projection> defaults to tableName.columnName
-      where: <expression to be used in predicate> defaults to tableName.columnName=?
+      readFilter: '?',
+      writeFilter: '?'
   }
 }
 

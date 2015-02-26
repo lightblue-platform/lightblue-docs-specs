@@ -109,10 +109,12 @@ Each field should be mapped to a column in a table.  Each column can have a func
     * if not specified and `table` is not defined at root of schema metadata persistance must fail
 * `column` - the column in the table
     * if not specified the column is assumed to be the metadata field name
-* `writeFilter` - a function applied when writing data, takes one argument `$value`
-    * for example: `"writeFilter": "to_upper($value)`
-* `readFilter` - a function applied when reading data, takes one argument `$value`
-    * for example: `"readFilter": "to_char($value, 'YYYYMMDD')"`
+* `writeFilter` - a function applied when writing data, takes one argument `?`
+    * for example: `"writeFilter": "to_upper(?)`
+    * default value is '?'
+* `readFilter` - a function applied when reading data, takes one argument `?`
+    * for example: `"readFilter": "to_char(?, 'YYYYMMDD')"`
+    * default value is '?'
 
 Example:
 ```json
@@ -132,8 +134,8 @@ Example:
                 "rdbms": {
                     "table": "my_table",
                     "column": "my_something",
-                    "writeFilter": "to_upper($value)",
-                    "readFilter": "to_lower($value)"
+                    "writeFilter": "to_upper(?)",
+                    "readFilter": "to_lower(?)"
                 }
             }
         }
