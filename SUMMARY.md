@@ -51,6 +51,7 @@
            * [Scenario: Dilution](backend_specifications/rdbms/scenario_dilution.md)
            * [Scenario: Merge](backend_specifications/rdbms/scenario_merge.md)
            * [Scenario: PL/SQL](backend_specifications/rdbms/scenario_plsql.md)
+           * [Scenario: Many-to-Many](backend_specifications/rdbms/scenario_many-to-many.md)
    * [LDAP](backend_specifications/ldap/README.md)
        * [Configure](backend_specifications/ldap/configure.md)
        * [Metadata](backend_specifications/ldap/metadata.md)
