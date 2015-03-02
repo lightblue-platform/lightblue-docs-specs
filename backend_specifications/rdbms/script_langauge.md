@@ -94,9 +94,9 @@ This procedure inserts a row to a table using the current document.
 ### update_row
 
 ```
-{ $update_row : { table: <tableName>,
-                  columns : [ ... ],
-                  where : { where clause } 
+{ update_row : { table: <tableName>,
+                 columns : [ ... ],
+                 where : { where clause } 
           }
 }
 ```
@@ -112,12 +112,25 @@ This procedure inserts a row to a table using the current document.
 ### delete_row
 
 ```
-{ $delete_row : { table: <tableName>,
-                  where: { where clause } 
-                } 
+{ delete_row : { table: <tableName>,
+                 where: { sql:"criteria", bindings: [...] } 
+               } 
 }
 ```
 
+### select
+
+```
+{ select : { project: [ col1, col2, {field: field3 },  ... ],
+             distinct: true|false,
+             join: { tables: [ table1, table2,...], on: { sql: "criteria", bindings:[...] } },
+             where: { sql: "criteria", bindings: [...] },
+             sort: [ { column: col, ascending: true}, { field: field, ascending: true} .,,, ] } }
+```
+
+Builds a select statement. The columns must refer to the tables in the
+join statement. If the tables in the join statement are aliased, the
+projection columns must also use the aliased names.
 
 ### foreach
 

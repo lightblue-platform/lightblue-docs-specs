@@ -114,6 +114,8 @@ Each field should be mapped to a column in a table.  Each column can have a func
     * for example: `"readFilter": "to_char(?, 'YYYYMMDD')"`
     * default value is '?'
 
+The '?' denotes a bind value; the actual value of the field will replace '?' when statements are executed. Because of this, all read/write filters must contain exactly one '?'.
+
 Example:
 ```json
 {
@@ -158,8 +160,7 @@ Example:
                   "foreignKeys": [
                      {
                         "table": "some_other_table",
-                        "columns": ["other_id"],
-                        "references": ["id"]
+                        "columns": ["other_id"]
                      }
                    ]
                 },
@@ -211,8 +212,7 @@ Example:
                   "foreignKeys": [
                      {
                         "table": "some_other_table",
-                        "columns": ["other_id"],
-                        "references": ["id"]
+                        "columns": ["other_id"]
                      }
                    ]
                 },
