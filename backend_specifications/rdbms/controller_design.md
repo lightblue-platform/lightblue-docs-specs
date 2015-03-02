@@ -43,7 +43,7 @@ fieldName : {
       writeFilter: '?'
   }
 }
-
+`       
 ### SQL STATEMENTS
 You have to build the set clause field by field.  The metadata maintainer is not going to define each possible update a client could request.  Similar for insert unless all fields are required, how can they know what will be passed in?  There's risk with binding a NULL by default because underlying tables could have default columns.  We'll have to be clear about what is done for an insert in the case when a default value exists for an optional column that was not set on insert.
 
@@ -57,3 +57,10 @@ Things like date need to have a standard transformation defined as part of the d
 Should identity be required?  Save can't work without some field to identify the record.  Is this already a constraint enforced in core?
 
 For arrays there needs to be some way to identify each element in the array.  Scenarios are assuming that all fields with an identity constraint in an array's object are used for such identitification.
+
+
+### GENERATED OPERATIONS AND SQL SCRIPTS
+We will generate the SQL operations using key relationships defined in metadata. However, it is not always possible to generate SQL operations because of some implicit logic that cannot be defined in metadata. Remember: modifying the underlying schema is not an option. For these cases, we should allow metadata definer to describe the logic to implement a particular operation. To support this, the controller is structured into two logical layers:
+  * SQL scripts encoded using a grammar represented in JSON. Using this language, metadata maintainer can define the operations required to insert/update/delete entities. If metadata declarations are not sufficient to implement the underlying logic, the metadata maintainer should use this procedural form to describe operations.
+  * Generation of SQL scripts using key relationships in metadata. This is the default mode of use. This case should be able to handle most property normalized cases.
+In normal operation (i.e. no SQL scripts are defined), the controller should generate SQL scripts using metadata, and execute those scripts. If SQL scripts are defined in metadata, the controller should simply execute those declared scripts.

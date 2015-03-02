@@ -4,8 +4,8 @@ A place to capture all notes regarding lightblue metadata for RDBMS.
 * [entityInfo](#entityInfo)
     * [datastore](#datastore)
 * [schema](#schema)
-    * [default table](#default-table)
-    * [primary keys](#primary-keys)
+    * [tables](#tables)
+    * [primary key](#primary-key)
     * [foreign keys](#foreign-keys)
     * [field definition](#field-definition)
     * [array relationships](#array-relationships)
@@ -33,8 +33,8 @@ In the datastore configuration we reference a datasource by name.  This is conta
 # schema
 All RDBMS extensions in the schema will be in an object called `"rdbms"`.
 
-## default table
-At the schema level, you can optionally set a default table.  This table is used for any fields that don't explicitely set a table.
+## tables
+Schema defines the tables used in the entity mapping. If there is only one table, fields don't need to explicitly declare table names in column mappings.
 
 
 ```json
@@ -42,30 +42,32 @@ At the schema level, you can optionally set a default table.  This table is used
     "entityInfo": { },
     "schema": {
         "rdbms": {
-            "table": "my_default_table"
+            "tables": [
+                {
+                   "table" : "my_default_table",
+                    ...
+                },
+                ...
+             ]
         }
     }
 }
 ```
 
-## primary keys
-In some cases the primary key may not be mapped to the metadata.  We still need a way to identify what that column is.  Because there could be many tables mapped to fields on any object within metadata it is necessary to capture information per table independent of field data.  This gives a way to lookup the PK for generating joins.
+## primary key
+This defines the primary keys for each table used in the mapping. Primary keys can include columns that are not mapped in entity metadata. 
+
 
 ```json
 {
     "entityInfo": { },
     "schema": {
-        "rdbms": {
-            "table": "my_default_table",
-            "primaryKeys": [
-                {
-                    "table": "my_default_table",
-                    "columns": ["id"]
-                },
-                {
-                    "table": "some_other_table",
-                    "columns": ["foo", "bar"]
-                }
+        "rdbms": { 
+            "tables" : [
+              {
+                "table": "my_default_table",
+                "primaryKey": ["id","foo","bar"]
+              }
             ]
         }
     }
@@ -73,30 +75,26 @@ In some cases the primary key may not be mapped to the metadata.  We still need 
 ```
 
 ## foreign keys
-Additionally, foreign keys have the same problem.  In the structure outlined here, the columns in the remote table map to the referenced table and the two array lenghts must match.  A flag `notNull` indicates if the FK value is optional.
+Foreign keys are required to generate join statements, In the structure outlined here, the columns in the remote table map to the referenced table and the two array lenghts must match.  A flag `notNull` indicates if the FK value is optional.
 
 ```json
 {
     "entityInfo": { },
     "schema": {
         "rdbms": {
-            "table": "my_default_table",
-            "primaryKeys": [
-                {
-                    "table": "my_default_table",
-                    "columns": ["id"]
-                }
-            ],
-            "foreignKeys": [
-                {
-                    "table": "some_other_table",
-                    "columns": ["other_id"],
-                    "notNull": false,
-                    "references": {
-                        "table": "my_default_table",
-                        "columns": ["id"]
-                }
-            ]
+           "tables" : [
+             {
+              "table": "my_default_table",
+              "primaryKey": ["id"]
+              "foreignKeys": [
+                  {
+                      "table": "some_other_table",
+                      "columns": ["other_id"],
+                      "notNull": false,
+                      "references": ["id"]
+                  }
+              ]
+           }
         }
     }
 }
@@ -153,22 +151,24 @@ Example:
     "entityInfo": { },
     "schema": {
         "rdbms": {
-            "primaryKeys": [
+           "tables" : [
+               { 
+                  "table" : "my_table",
+                  "primaryKey": ["id"],
+                  "foreignKeys": [
+                     {
+                        "table": "some_other_table",
+                        "columns": ["other_id"],
+                        "references": ["id"]
+                     }
+                   ]
+                },
                 {
-                    "table": "my_table",
-                    "columns": ["id"]
+                   "table" : "some_other_table",
+                   "primaryKey" : ["some_other_id" ],
                 }
-            ],
-            "foreignKeys": [
-                {
-                    "table": "some_other_table",
-                    "columns": ["other_id"],
-                    "references": {
-                        "table": "my_table",
-                        "columns": ["id"]
-                }
-            ]
-        }
+           ]
+        },
         "fields": {
             "a": {
                 "type": "string",
@@ -204,22 +204,24 @@ Example:
     "entityInfo": { },
     "schema": {
         "rdbms": {
-            "primaryKeys": [
+           "tables" : [
+               { 
+                  "table" : "my_table",
+                  "primaryKey": ["id"],
+                  "foreignKeys": [
+                     {
+                        "table": "some_other_table",
+                        "columns": ["other_id"],
+                        "references": ["id"]
+                     }
+                   ]
+                },
                 {
-                    "table": "my_table",
-                    "columns": ["id"]
+                   "table" : "some_other_table",
+                   "primaryKey" : ["some_other_id" ],
                 }
-            ],
-            "foreignKeys": [
-                {
-                    "table": "some_other_table",
-                    "columns": ["other_id"],
-                    "references": {
-                        "table": "my_table",
-                        "columns": ["id"]
-                }
-            ]
-        }
+           ]
+        },
         "fields": {
             "a": {
                 "type": "string",

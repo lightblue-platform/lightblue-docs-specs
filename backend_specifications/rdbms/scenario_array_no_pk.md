@@ -150,6 +150,19 @@ INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
 VALUES (123456, 'three');
 ```
 
+## Script
+
+```
+ [ { insert_row : { table:BASE, columns: [ $non_null_fields ] } },
+   { foreach : { field: arrayStringWithoutPk, elem: x, 
+        do: { insert_row : { table:ARRAY_STRING_WITHOUT_PK, 
+                             columns: [ { field: x }, {column: base_id, field: $parent._id } ] }  } 
+     } 
+   }
+ ]
+```
+
+
 ## lightblue response
 ```json
 {
@@ -207,6 +220,23 @@ POST /data/update/arrayNoPk/0.1.0
 ```sql
 INSERT INTO ARRAY_STRING_WITHOUT_PK (BASE_ID, S_FIELD)
 VALUES (123456, 'four');
+```
+
+## Script
+
+```
+[  { update_row : { table: BASE, columns: [ $modified_columns ] } },
+   { collection_update : { field : arrayStringWithoutPk, 
+                           table: ARRAY_STRING_WITHOUT_PK, 
+                           retrieval: { $select : { from : ARRAY_STRING_WITHOUT_PK, 
+                                                    columns : [ $all_columns, { column: base_id } ],
+                                                    where : { q: "base_id=?", bindings: [ { field:$parent_id } ] } } },
+                           inserted_rows: { insert_row : { table: ARRAY_STRING_WITHOUT_PK, columns[$all_columns]} },
+                           updated_rows: { update_row: {table: ARRAY_STRING_WITHOUT_PK, columns[$modified_columns],
+                                                        where: {q: "base_id=? and S_FIELD=?", bindings:[{field:$parent._id}, {field:x}]} }},
+                           deleted_rows: { delete_row: {table: ARRAY_STRING_WITHOUT_PK,
+                                                        where: { q: "base_id=? and S_FIELD=?", bindings: [{field:$parent._id}, {field:x}]} } } } }
+]
 ```
 
 ## lightblue response
