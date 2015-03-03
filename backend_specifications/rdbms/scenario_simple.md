@@ -246,6 +246,12 @@ INSERT INTO MY_TABLE (MY_DATE, MY_NUMBER, MY_VARCHAR2)
 VALUES (to_date('20150217 222100', 'YYYYMMDD HH24MISS'), 123456, 'hi there');
 ```
 
+## Script
+
+```json
+{ insert_row: { table: my_table, columns: [ $non_null_columns ] } }
+```
+
 ## lightblue response
 ```json
 {
@@ -296,6 +302,11 @@ POST /data/update/myMetadata/0.1.0
 UPDATE MY_TABLE
 SET MY_CHAR='boo!'
 WHERE MY_NUMBER = 123456;
+```
+
+### Script
+```json
+{ update_row : { table: my_table, columns: [ $modified_columns ], where: { sql:"my_number=?", bindings: [ 123456] } } }
 ```
 
 ## lightblue response
@@ -441,6 +452,12 @@ POST /data/delete/myMetadata/0.1.0
 DELETE FROM MY_TABLE
 WHERE MY_NUMBER=123456;
 ```
+
+## Script
+```json
+{ delete_row: { table:my_table, where: { sql: "my_number=?", bindings: [ _123456] } } }
+```
+##
 
 ## lightblue response
 ```json
