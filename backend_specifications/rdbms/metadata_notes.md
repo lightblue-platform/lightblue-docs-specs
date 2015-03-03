@@ -100,6 +100,50 @@ Foreign keys are required to generate join statements, In the structure outlined
 }
 ```
 
+## Default Procedures
+
+Default insert/update/delete procedures can be defined for
+tables. Unless specified, those defaults can be used to operate on
+those tables:
+
+e.g.
+
+Declaration:
+```
+{ table : BASE,
+  insert: [    { sql : { sql: "select seq.next from dual", resultbinding: [ _id ] } },
+               { insert_row : { table: BASE,
+                                columns: [ cols ] } } ],
+  update: [ ... ],
+  delete: [ ... ]
+}
+```
+
+Usage:
+...
+ { insert_row : { table: BASE } },
+...
+
+When declared and used as above, the default_insert would be replaced
+with the insert script for table BASE.
+
+### Default identification
+
+We can define a default WHERE clause to identify a row in the database. This defaults to a WHERE clause using the primary keys of the table. 
+
+Declaration:
+```
+{ table: BASE,
+  identify: { where:"parent_id=? and value=?", bindings:[{field:$parent._id},{field:value} ] }
+}
+```
+The 'identify' declaration then assumed whenever a row needs to be identified, and the WHERE clause is not specified.
+
+```
+{ update_row: { table:BASE } }
+```
+
+
 ## field definition
 Each field should be mapped to a column in a table.  Each column can have a function associated with it to manipulate modified data and for data retrieval.  Properties in `"rdbms"` are:
 * `table` - the table for the column

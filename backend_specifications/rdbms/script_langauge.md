@@ -175,46 +175,5 @@ This does the following:
   - inserts/updates/deletes rows using the scripts
 
 
-## Default Procedures
 
-Default insert/update/delete procedures can be defined for
-tables. Unless specified, those defaults can be used to operate on
-those tables:
-
-e.g.
-
-Declaration:
-```
-{ table : BASE,
-  insert: [    { sql : { sql: "select seq.next from dual", resultbinding: [ _id ] } },
-               { insert_row : { table: BASE,
-                                columns: [ cols ] } } ],
-  update: [ ... ],
-  delete: [ ... ]
-}
-```
-
-Usage:
-...
- { insert_row : { table: BASE } },
-...
-
-When declared and used as above, the default_insert would be replaced
-with the insert script for table BASE.
-
-## Default identification
-
-We can define a default WHERE clause to identify a row in the database.
-
-Declaration:
-```
-{ table: BASE,
-  identify: { where:"parent_id=? and value=?", bindings:[{field:$parent._id},{field:value} ] }
-}
-```
-The 'identify' declaration then assumed whenever a row needs to be identified, and the WHERE clause is not specified.
-
-```
-{ update_row: { table:BASE } }
-```
 

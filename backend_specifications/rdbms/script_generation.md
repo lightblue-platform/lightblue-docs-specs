@@ -112,3 +112,6 @@ Example:
                { insert_row : { table: BASE } } ]
 ```
 
+## Update/Save generation
+
+Save is implemented as an update of all fields, so only update generation will be handled.
