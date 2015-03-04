@@ -90,8 +90,7 @@ Foreign keys are required to generate join statements, In the structure outlined
                   {
                       "table": "some_other_table",
                       "columns": ["other_id"],
-                      "notNull": false,
-                      "references": ["id"]
+                      "notNull": false
                   }
               ]
            }

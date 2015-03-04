@@ -56,38 +56,23 @@ Create Table MAP_A_B (
             "value": "0.1.0"
         },
         "rdbms": {
-            "table": "TABLE_A",
-            "primaryKeys": [
-                {
-                    "table": "TABLE_A",
-                    "columns": ["ID"]
-                },
-                {
-                    "table": "TABLE_B",
-                    "columns": ["ID"]
-                },
-                {
-                    "table": "MAP_A_B",
-                    "columns": ["A_ID", "B_ID"]
-                }
-            ],
-            "foreignKeys": [
-                {
-                    "table": "MAP_A_B",
-                    "columns": ["A_ID"],
-                    "references": {
-                        "table": "TABLE_A",
-                        "columns": ["ID"]
-                    }
-                },
-                {
-                    "table": "MAP_A_B",
-                    "columns": ["B_ID"],
-                    "references": {
-                        "table": "TABLE_B",
-                        "columns": ["ID"]
-                    }
-                }
+           "tables": [
+             {
+                "table": "TABLE_A",
+                "primaryKey": [ "ID" ],
+             },
+             {
+                "table" : "TABLE_B",
+                "primaryKey": [ "ID" ]
+             },
+             {
+                "table" : "MAP_A_B",
+                "primaryKey": ["A_ID", "B_ID"],
+                "foreignKeys" : [
+                   {"table" : "TABLE_A", "column" : "A_ID" },
+                   {"table" : "TABLE_B", "column" : "B_ID" }
+                ]
+             }
             ]
         },
         "fields": {
@@ -214,6 +199,19 @@ INSERT INTO MAP_A_B (A_ID, B_ID)
 VALUES (100, 200);
 INSERT INTO MAP_A_B (A_ID, B_ID)
 VALUES (100, 300);
+```
+
+## Script
+The script below assumes elements of 'b' are looked up, and inserted if not found.
+```json
+[ { insert_row: { table: table_a } },
+  { for_each: { field: b, elem: x, do: [
+                {resultset: { name: r, value:{ select: { join: [ table_b ], where: { sql: "id=?", bindings:[{field:x.id}]}}}}},
+                { ifempty: r, then: [
+                         { insert_row: { table: table_b, columns: [ { field: x.id }, { field: x.b} ] } },
+                         { insert_row: { table: map_a_b, columns: [ { column: a_id, value=_id }, {column:b_id, value=x.id} ] } } ],
+                   else: {insert_row: { table: map_a_b, columns: [ { column: a_id, value=_id }, {column:b_id, value=x.id} ] } } }} ] } 
+]
 ```
 
 ## lightblue response

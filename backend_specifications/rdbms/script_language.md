@@ -175,5 +175,18 @@ This does the following:
   - inserts/updates/deletes rows using the scripts
 
 
+### resultset
+Assigns the resultset of a query to a variable.
+```
+{ resultset: { name: variableName, value: query } }
+```
+Runs the `query`, and assigns the result set of the query to `variableName`. That variable name then can be used in `if` or `foreach` statements.
+
+### conditionals
+
+```
+{ ifempty: var, then: { ... }, else: {...} }
+```
+If 'var' is empty, runs 'then' script, otherwise 'else' script. 'var' can be a resultset or an array field.
 
 
