@@ -77,6 +77,24 @@ Uses sqlClause to read/write a column or columns, and associates that value(s) w
 * For UPDATE operations, two pseudo-fields are defined: '$new' and '$old'. '$new' refers to the document containing the values that will be written. '$old' refers to the values that are in the database before the update. '$new.x' refers to the new value of field 'x', and '$old.x' refers to the value of 'x' in the db before the update operation. Unqualified references assume '$new', i.e. 'x' will refer to '$new.x'.
 * DELETE operations only assume that the unique identifiers for the entity are known. If more information is necessary to delete any associated data in other tables, the DELETE script should read them.
 
+### Bindings
+
+SQL clauses include bindings. For every '?' in the clause, there must be one binding.
+```
+{ sql: "column=?", bindings:[ {field:f} ]  }
+```
+Bindings can be one of the following:
+```
+{ value: "xyx" }
+{ value: 123 }
+{ field: fieldName }
+{ variable: varName }
+```
+By default, the value represented by the binding is an IN parameter, that is, the value is substituted into the SQL statement. OUT parameters can be used as well:
+```
+ { field: fieldName, out:true }
+```
+
 ## Statements
 
 ### insert_row
@@ -190,3 +208,14 @@ Runs the `query`, and assigns the result set of the query to `variableName`. Tha
 If 'var' is empty, runs 'then' script, otherwise 'else' script. 'var' can be a resultset or an array field.
 
 
+### SQL
+
+```
+{ sql: { sql: query, bindings: [ bindings...], resultbindings: [ resultbindings,...] } }
+```
+
+Executes a SQL statement. `bindings` are IN or OUT parameters to the
+SQL statement. `resultbindings` are bindings to the columns of the
+result set of the operation, if it has a result set. Order of bindings
+and resultbindings are important, bindings order has to match the
+markers '?' and resultbindings order has to match the columns.
