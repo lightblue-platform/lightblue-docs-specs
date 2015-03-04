@@ -152,14 +152,44 @@ VALUES (123456, 'three');
 
 ## Script
 
-```
- [ { insert_row : { table:BASE, columns: [ $non_null_fields ] } },
-   { foreach : { field: arrayStringWithoutPk, elem: x, 
-        do: { insert_row : { table:ARRAY_STRING_WITHOUT_PK, 
-                             columns: [ { field: x }, {column: base_id, field: $parent._id } ] }  } 
-     } 
-   }
- ]
+```json
+[
+    {
+        "do": [
+            {
+                "operation": "insert_row",
+                "table": "BASE",
+                "columns": [
+                    "$non_null_fields"
+                ]
+            }
+        ]
+    },
+    {
+        "foreach": {
+            "field": "arrayStringWithoutPk",
+            "element": {
+                "field": "$x"
+            },
+            "do": [
+                {
+                    "operation": "insert_row",
+                    "table": "ARRAY_STRING_WITHOUT_PK",
+                    "columns": [
+                        {
+                            "column": "s_field",
+                            "field": "$x"
+                        },
+                        {
+                            "column": "base_id",
+                            "field": "$parent._id"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]
 ```
 
 
@@ -167,7 +197,7 @@ VALUES (123456, 'three');
 ```json
 {
     "status": "complete",
-   "modifiedCount": 1,
+    "modifiedCount": 1,
     "matchCount": 1,
     "processed": [
         {
@@ -224,18 +254,113 @@ VALUES (123456, 'four');
 
 ## Script
 
-```
-[  { update_row : { table: BASE, columns: [ $modified_columns ] } },
-   { collection_update : { field : arrayStringWithoutPk, 
-                           table: ARRAY_STRING_WITHOUT_PK, 
-                           retrieval: { $select : { from : ARRAY_STRING_WITHOUT_PK, 
-                                                    columns : [ $all_columns, { column: base_id } ],
-                                                    where : { q: "base_id=?", bindings: [ { field:$parent_id } ] } } },
-                           inserted_rows: { insert_row : { table: ARRAY_STRING_WITHOUT_PK, columns[$all_columns]} },
-                           updated_rows: { update_row: {table: ARRAY_STRING_WITHOUT_PK, columns[$modified_columns],
-                                                        where: {q: "base_id=? and S_FIELD=?", bindings:[{field:$parent._id}, {field:x}]} }},
-                           deleted_rows: { delete_row: {table: ARRAY_STRING_WITHOUT_PK,
-                                                        where: { q: "base_id=? and S_FIELD=?", bindings: [{field:$parent._id}, {field:x}]} } } } }
+```json
+[
+    {
+        "do": [
+            {
+                "operation": "update_row",
+                "table": "BASE",
+                "columns": [
+                    "$modified_columns"
+                ]
+            }
+        ]
+    },
+    {
+        "foreach": {
+            "field": "arrayStringWithoutPk",
+            "element": "$x",
+            "do": [
+                {
+                    "operation": "select_row",
+                    "table": "ARRAY_STRING_WITHOUT_PK",
+                    "columns": [
+                        "$all_columns",
+                        {
+                            "column": "base_id"
+                        }
+                    ],
+                    "where": {
+                        "q": "base_id=? and s_field=?",
+                        "bindings": [
+                            {
+                                "field": "$parent._id"
+                            },
+                            {
+                                "field": "$x"
+                            }
+                        ]
+                    },
+                    "returning": {
+                        "elem": "$y"
+                    }
+                },
+                {
+                    "operation": "insert_row",
+                    "table": "ARRAY_STRING_WITHOUT_PK",
+                    "columns": [
+                        {
+                            "column": "s_field",
+                            "field": "$x"
+                        },
+                        {
+                            "column": "base_id",
+                            "field": "$parent._id"
+                        }
+                    ],
+                    "where": {
+                        "q": "? is null",
+                        "bindings": [
+                            {
+                                "field": "$y"
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "do": [
+            {
+                "operation": "select_row",
+                "table": "ARRAY_STRING_WITHOUT_PK",
+                "columns": [
+                    "$all_columns"
+                ],
+                "where": {
+                    "q": "base_id=? and s_field=?",
+                    "bindings": [
+                        {
+                            "field": "$parent._id"
+                        },
+                        {
+                            "field": "$x"
+                        }
+                    ]
+                },
+                "returning": {
+                    "array": "$y"
+                }
+            },
+            {
+                "operation": "delete_row",
+                "table": "ARRAY_STRING_WITHOUT_PK",
+                "where": {
+                    "q": "base_id=? and S_FIELD not in (?)",
+                    "bindings": [
+                        {
+                            "field": "$parent._id"
+                        },
+                        {
+                            "array": "$y"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
 ]
 ```
 

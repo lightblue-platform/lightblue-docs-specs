@@ -34,16 +34,20 @@ Configuration must indicate the dialect.  Maybe it could be pulled from the data
 ### OVERRIDE DEFAULT FOR EACH OPERATION PER FIELD
 For field mappings, it might be useful to have a mechanism to define further customization depending on operation. The most obvious way is to define how the field is used in insert/update/select statements. Something like this:
 
-fieldName : {
-  type: string,
-  rdbms: {
-      table: tableName,
-      column: columnName,
-      readFilter: '?',
-      writeFilter: '?'
-  }
+```json
+{
+    "fieldName": {
+        "type": "string",
+        "rdbms": {
+            "table": "tableName",
+            "column": "columnName",
+            "readFilter": "'?'",
+            "writeFilter": "'?'"
+        }
+    }
 }
-`       
+```
+
 ### SQL STATEMENTS
 You have to build the set clause field by field.  The metadata maintainer is not going to define each possible update a client could request.  Similar for insert unless all fields are required, how can they know what will be passed in?  There's risk with binding a NULL by default because underlying tables could have default columns.  We'll have to be clear about what is done for an insert in the case when a default value exists for an optional column that was not set on insert.
 
@@ -63,4 +67,5 @@ For arrays there needs to be some way to identify each element in the array.  Sc
 We will generate the SQL operations using key relationships defined in metadata. However, it is not always possible to generate SQL operations because of some implicit logic that cannot be defined in metadata. Remember: modifying the underlying schema is not an option. For these cases, we should allow metadata definer to describe the logic to implement a particular operation. To support this, the controller is structured into two logical layers:
   * SQL scripts encoded using a grammar represented in JSON. Using this language, metadata maintainer can define the operations required to insert/update/delete entities. If metadata declarations are not sufficient to implement the underlying logic, the metadata maintainer should use this procedural form to describe operations.
   * Generation of SQL scripts using key relationships in metadata. This is the default mode of use. This case should be able to handle most property normalized cases.
+
 In normal operation (i.e. no SQL scripts are defined), the controller should generate SQL scripts using metadata, and execute those scripts. If SQL scripts are defined in metadata, the controller should simply execute those declared scripts.

@@ -75,25 +75,51 @@ This defines the primary keys for each table used in the mapping. Primary keys c
 ```
 
 ## foreign keys
-Foreign keys are required to generate join statements, In the structure outlined here, the columns in the remote table map to the referenced table and the two array lenghts must match.  A flag `notNull` indicates if the FK value is optional.
+Foreign keys are required to generate join statements. In the structure outlined here, the columns in the remote table map to the referenced table and the two array lenghts must match.  A flag `notNull` indicates if the FK value is optional.
 
+In this example:
+* some_table_1 has an optional FK to my_default_table
+* some_table_2 has a required FK to some_table_1
 ```json
 {
-    "entityInfo": { },
+    "entityInfo": {},
     "schema": {
         "rdbms": {
-           "tables" : [
-             {
-              "table": "my_default_table",
-              "primaryKey": ["id"]
-              "foreignKeys": [
-                  {
-                      "table": "some_other_table",
-                      "columns": ["other_id"],
-                      "notNull": false
-                  }
-              ]
-           }
+            "tables": [
+                {
+                    "table": "my_default_table",
+                    "primaryKey": [
+                        "id"
+                    ]
+                },
+                {
+                    "table": "some_table_1",
+                    "primaryKey": [
+                        "id"
+                    ],
+                    "foreignKeys": [
+                        {
+                            "table": "my_default_table",
+                            "columns": [
+                                "other_id"
+                            ],
+                            "notNull": false
+                        }
+                    ]
+                },
+                {
+                    "table": "some_table_2",
+                    "foreignKeys": [
+                        {
+                            "table": "some_table_1",
+                            "columns": [
+                                "some_1_id"
+                            ],
+                            "notNull": true
+                        }
+                    ]
+                }
+            ]
         }
     }
 }
@@ -128,7 +154,7 @@ with the insert script for table BASE.
 
 ### Default identification
 
-We can define a default WHERE clause to identify a row in the database. This defaults to a WHERE clause using the primary keys of the table. 
+We can define a default WHERE clause to identify a row in the database. This defaults to a WHERE clause using the primary keys of the table. All fields used in identity must be required in lightblue metadata.
 
 Declaration:
 ```
@@ -151,10 +177,10 @@ Each field should be mapped to a column in a table.  Each column can have a func
 * `column` - the column in the table
     * if not specified the column is assumed to be the metadata field name
 * `writeFilter` - a function applied when writing data, takes one argument `?`
-    * for example: `"writeFilter": "to_upper(?)`
+    * for example: `"writeFilter": "to_upper('?')"`
     * default value is '?'
 * `readFilter` - a function applied when reading data, takes one argument `?`
-    * for example: `"readFilter": "to_char(?, 'YYYYMMDD')"`
+    * for example: `"readFilter": "to_char('?', 'YYYYMMDD')"`
     * default value is '?'
 
 The '?' denotes a bind value; the actual value of the field will replace '?' when statements are executed. Because of this, all read/write filters must contain exactly one '?'.
@@ -177,8 +203,8 @@ Example:
                 "rdbms": {
                     "table": "my_table",
                     "column": "my_something",
-                    "writeFilter": "to_upper(?)",
-                    "readFilter": "to_lower(?)"
+                    "writeFilter": "to_upper('?')",
+                    "readFilter": "to_lower('?')"
                 }
             }
         }
@@ -209,7 +235,7 @@ Example:
                 },
                 {
                    "table" : "some_other_table",
-                   "primaryKey" : ["some_other_id" ],
+                   "primaryKey" : ["some_other_id" ]
                 }
            ]
         },
@@ -261,7 +287,7 @@ Example:
                 },
                 {
                    "table" : "some_other_table",
-                   "primaryKey" : ["some_other_id" ],
+                   "primaryKey" : ["some_other_id"]
                 }
            ]
         },
