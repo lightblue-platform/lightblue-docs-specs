@@ -203,7 +203,7 @@ VALUES (100, 300);
 
 ## Script
 The script below assumes elements of 'b' are looked up, and inserted if not found.
-```json
+```
 [ { insert_row: { table: table_a } },
   { for_each: { field: b, elem: x, do: [
                 {resultset: { name: r, value:{ select: { join: [ table_b ], where: { sql: "id=?", bindings:[{field:x.id}]}}}}},
