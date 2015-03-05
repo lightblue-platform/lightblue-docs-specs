@@ -249,7 +249,15 @@ VALUES (to_date('20150217 222100', 'YYYYMMDD HH24MISS'), 123456, 'hi there');
 ## Script
 
 ```json
-{ insert_row: { table: my_table, columns: [ $non_null_columns ] } }
+[
+    {
+        "operation": "insert_row",
+        "table": "my_table",
+        "columns": [
+            "$non_null_columns"
+        ]
+    }
+]
 ```
 
 ## lightblue response

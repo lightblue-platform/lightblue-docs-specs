@@ -56,23 +56,36 @@ Create Table MAP_A_B (
             "value": "0.1.0"
         },
         "rdbms": {
-           "tables": [
-             {
-                "table": "TABLE_A",
-                "primaryKey": [ "ID" ],
-             },
-             {
-                "table" : "TABLE_B",
-                "primaryKey": [ "ID" ]
-             },
-             {
-                "table" : "MAP_A_B",
-                "primaryKey": ["A_ID", "B_ID"],
-                "foreignKeys" : [
-                   {"table" : "TABLE_A", "column" : "A_ID" },
-                   {"table" : "TABLE_B", "column" : "B_ID" }
-                ]
-             }
+            "tables": [
+                {
+                    "table": "TABLE_A",
+                    "primaryKey": [
+                        "ID"
+                    ]
+                },
+                {
+                    "table": "TABLE_B",
+                    "primaryKey": [
+                        "ID"
+                    ]
+                },
+                {
+                    "table": "MAP_A_B",
+                    "primaryKey": [
+                        "A_ID",
+                        "B_ID"
+                    ],
+                    "foreignKeys": [
+                        {
+                            "table": "TABLE_A",
+                            "column": "A_ID"
+                        },
+                        {
+                            "table": "TABLE_B",
+                            "column": "B_ID"
+                        }
+                    ]
+                }
             ]
         },
         "fields": {
@@ -203,14 +216,77 @@ VALUES (100, 300);
 
 ## Script
 The script below assumes elements of 'b' are looked up, and inserted if not found.
-```
-[ { insert_row: { table: table_a } },
-  { for_each: { field: b, elem: x, do: [
-                {resultset: { name: r, value:{ select: { join: [ table_b ], where: { sql: "id=?", bindings:[{field:x.id}]}}}}},
-                { ifempty: r, then: [
-                         { insert_row: { table: table_b, columns: [ { field: x.id }, { field: x.b} ] } },
-                         { insert_row: { table: map_a_b, columns: [ { column: a_id, value=_id }, {column:b_id, value=x.id} ] } } ],
-                   else: {insert_row: { table: map_a_b, columns: [ { column: a_id, value=_id }, {column:b_id, value=x.id} ] } } }} ] } 
+```json
+[
+    {
+        "operation": "insert_row",
+        "table": "table_a",
+        "columns": [
+            "$non_null_fields"
+        ]
+    },
+    {
+        "foreach": {
+            "field": "b",
+            "elem": "$x",
+            "do": [
+                {
+                    "operation": "select_row",
+                    "table": "table_b",
+                    "columns": [
+                        "$all_columns",
+                        {
+                            "column": "base_id"
+                        }
+                    ],
+                    "where": {
+                        "q": "id=?",
+                        "bindings": [
+                            {
+                                "field": "$x.id"
+                            }
+                        ]
+                    },
+                    "returning": {
+                        "elem": "$r"
+                    }
+                },
+                {
+                    "operation": "insert_row",
+                    "table": "TABLE_B",
+                    "conditions": [
+                        {
+                            "isEmpty": "$r"
+                        }
+                    ],
+                    "columns": [
+                        {
+                            "column": "id",
+                            "field": "$x.id"
+                        },
+                        {
+                            "column": "b_field",
+                            "field": "$x.b"
+                        }
+                    ]
+                },
+                {
+                    "operation": "insert_row",
+                    "table": "MAP_A_B",
+                    "columns": [
+                        {
+                            "column": "a_id",
+                            "field": "$parent.id"
+                        },
+                        {
+                            "column": "b_id",
+                            "field": "$x.b"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 ]
 ```
 
