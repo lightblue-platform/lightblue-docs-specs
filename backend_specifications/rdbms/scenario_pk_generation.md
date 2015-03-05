@@ -143,8 +143,37 @@ END
 /
 
 ```
-[ { sql: { sql: "insert into base (a_field) values (?) returning id into val", bindings: [ {field:subDocument.s}, {variable: id, out:true} ] } },
-  { insert_row: { table: sub_document } }
+[
+    {
+        "operation": "insert_row",
+        "table": "base",
+        "columns": [
+            "$not_null_columns"
+        ],
+        "returning": {
+            "column": "id",
+            "field": "id"
+        }
+    },
+    {
+        "foreach": {
+            "field": "subDocument",
+            "object": "$x",
+            "do": [
+                {
+                    "operation": "insert_row",
+                    "table": "sub_document",
+                    "columns": [
+                        "$not_null_columns",
+                        {
+                            "column": "base_id",
+                            "field": "$parent.id"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
 ]
 ```
 

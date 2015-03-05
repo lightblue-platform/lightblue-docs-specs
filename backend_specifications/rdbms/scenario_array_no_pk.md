@@ -155,14 +155,10 @@ VALUES (123456, 'three');
 ```json
 [
     {
-        "do": [
-            {
-                "operation": "insert_row",
-                "table": "BASE",
-                "columns": [
-                    "$non_null_fields"
-                ]
-            }
+        "operation": "insert_row",
+        "table": "BASE",
+        "columns": [
+            "$non_null_fields"
         ]
     },
     {
@@ -257,14 +253,10 @@ VALUES (123456, 'four');
 ```json
 [
     {
-        "do": [
-            {
-                "operation": "update_row",
-                "table": "BASE",
-                "columns": [
-                    "$modified_columns"
-                ]
-            }
+        "operation": "update_row",
+        "table": "BASE",
+        "columns": [
+            "$modified_columns"
         ]
     },
     {
@@ -293,12 +285,17 @@ VALUES (123456, 'four');
                         ]
                     },
                     "returning": {
-                        "elem": "$y"
+                        "elem": "$r"
                     }
                 },
                 {
                     "operation": "insert_row",
                     "table": "ARRAY_STRING_WITHOUT_PK",
+                    "conditions": [
+                        {
+                            "isEmpty": "$r"
+                        }
+                    ],
                     "columns": [
                         {
                             "column": "s_field",
@@ -308,58 +305,46 @@ VALUES (123456, 'four');
                             "column": "base_id",
                             "field": "$parent._id"
                         }
-                    ],
-                    "where": {
-                        "q": "? is null",
-                        "bindings": [
-                            {
-                                "field": "$y"
-                            }
-                        ]
-                    }
+                    ]
                 }
             ]
         }
     },
     {
-        "do": [
-            {
-                "operation": "select_row",
-                "table": "ARRAY_STRING_WITHOUT_PK",
-                "columns": [
-                    "$all_columns"
-                ],
-                "where": {
-                    "q": "base_id=? and s_field=?",
-                    "bindings": [
-                        {
-                            "field": "$parent._id"
-                        },
-                        {
-                            "field": "$x"
-                        }
-                    ]
+        "operation": "select_row",
+        "table": "ARRAY_STRING_WITHOUT_PK",
+        "columns": [
+            "$all_columns"
+        ],
+        "where": {
+            "q": "base_id=? and s_field=?",
+            "bindings": [
+                {
+                    "field": "$parent._id"
                 },
-                "returning": {
+                {
+                    "field": "$x"
+                }
+            ]
+        },
+        "returning": {
+            "array": "$y"
+        }
+    },
+    {
+        "operation": "delete_row",
+        "table": "ARRAY_STRING_WITHOUT_PK",
+        "where": {
+            "q": "base_id=? and S_FIELD not in (?)",
+            "bindings": [
+                {
+                    "field": "$parent._id"
+                },
+                {
                     "array": "$y"
                 }
-            },
-            {
-                "operation": "delete_row",
-                "table": "ARRAY_STRING_WITHOUT_PK",
-                "where": {
-                    "q": "base_id=? and S_FIELD not in (?)",
-                    "bindings": [
-                        {
-                            "field": "$parent._id"
-                        },
-                        {
-                            "array": "$y"
-                        }
-                    ]
-                }
-            }
-        ]
+            ]
+        }
     }
 ]
 ```

@@ -132,9 +132,18 @@ PUT /data/insert/arrayPk/0.1.0
             "id": "123456",
             "a": "b",
             "arrayStringWitPk": [
-                { "id":1, s:"one" },
-                { "id":2, s:"two" },
-                { "id":3, s:"three"}
+                {
+                    "id": 1,
+                    "s": "one"
+                },
+                {
+                    "id": 2,
+                    "s": "two"
+                },
+                {
+                    "id": 3,
+                    "s": "three"
+                }
             ]
         }
     ],
