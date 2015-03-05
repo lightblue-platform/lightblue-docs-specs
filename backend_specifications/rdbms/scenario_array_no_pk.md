@@ -325,6 +325,20 @@ VALUES (123456, 'four');
     }
 ]
 ```
+```
+[  { update_row : { table: BASE, columns: [ $modified_columns ] } },
+   { collection_update : { field : arrayStringWithoutPk, 
+                           table: ARRAY_STRING_WITHOUT_PK, 
+                           retrieval: { $select : { from : ARRAY_STRING_WITHOUT_PK, 
+                                                    columns : [ $all_columns, { column: base_id } ],
+                                                    where : { q: "base_id=?", bindings: [ { field:$parent_id } ] } } },
+                           inserted_rows: { insert_row : { table: ARRAY_STRING_WITHOUT_PK, columns[$all_columns]} },
+                           updated_rows: { update_row: {table: ARRAY_STRING_WITHOUT_PK, columns[$modified_columns],
+                                                        where: {q: "base_id=? and S_FIELD=?", bindings:[{field:$parent._id}, {field:x}]} }},
+                           deleted_rows: { delete_row: {table: ARRAY_STRING_WITHOUT_PK,
+                                                        where: { q: "base_id=? and S_FIELD=?", bindings: [{field:$parent._id}, {field:x}]} } } } }
+]
+```
 
 ## lightblue response
 ```json
