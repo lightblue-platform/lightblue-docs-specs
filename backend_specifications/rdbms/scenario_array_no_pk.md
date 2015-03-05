@@ -309,27 +309,6 @@ VALUES (123456, 'four');
         }
     },
     {
-        "operation": "select_row",
-        "table": "ARRAY_STRING_WITHOUT_PK",
-        "columns": [
-            "$all_columns"
-        ],
-        "where": {
-            "q": "base_id=? and s_field=?",
-            "bindings": [
-                {
-                    "field": "$parent._id"
-                },
-                {
-                    "var": "x"
-                }
-            ]
-        },
-        "returning": {
-            "array": "y"
-        }
-    },
-    {
         "operation": "delete_row",
         "table": "ARRAY_STRING_WITHOUT_PK",
         "where": {
@@ -339,7 +318,7 @@ VALUES (123456, 'four');
                     "field": "$parent._id"
                 },
                 {
-                    "array": "$y"
+                    "array": "arrayStringWithoutPk.*"
                 }
             ]
         }
@@ -522,6 +501,36 @@ WHERE BASE_ID=123456;
 
 DELETE FROM BASE
 WHERE ID=123456;
+```
+
+## Script
+```json
+[
+    {
+        "operation": "delete_row",
+        "table": "ARRAY_STRING_WITHOUT_PK",
+        "where": {
+            "q": "base_id=?",
+            "bindings": [
+                {
+                    "value": 123456
+                }
+            ]
+        }
+    },
+    {
+        "operation": "delete_row",
+        "table": "BASE",
+        "where": {
+            "q": "id=?",
+            "bindings": [
+                {
+                    "value": 123456
+                }
+            ]
+        }
+    }
+]
 ```
 
 ## lightblue response

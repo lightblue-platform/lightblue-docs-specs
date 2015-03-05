@@ -176,14 +176,45 @@ VALUES (3,123456, 'three');
 ## Script
 
 ```
- [ { insert_row : { table:BASE, columns: [ $non_null_fields ] } },
-   { foreach : { field: arrayStringWithPk, elem: x, 
-        do: [  { sql : { sql: "select seq.next from dual", resultbinding: [ id ] } },
-               { insert_row : { table:ARRAY_STRING_WITH_PK, 
-                        columns: [ { column: base_id, field: $parent_id}, {field: id}, {field:s } ] } } ]
-     } 
-   }
- ]
+[
+    {
+        "operation": "insert_row",
+        "table": "BASE",
+        "columns": [
+            "$non_null_fields"
+        ]
+    },
+    {
+        "foreach": {
+            "field": "arrayStringWithPk",
+            "elem": "$x",
+            "do": [
+                {
+                    "operation": "select_row",
+                    "table": "dual",
+                    "columns": [
+                        "seq.next"
+                    ],
+                    "returning": {
+                        "column": 1,
+                        "field": "id"
+                    }
+                },
+                {
+                    "operation": "insert_row",
+                    "table": "ARRAY_STRING_WITH_PK",
+                    "columns": [
+                        "$not_null_columns",
+                        {
+                            "column": "base_id",
+                            "field": "$parent.id"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+]
 ```
 
 
@@ -191,7 +222,7 @@ VALUES (3,123456, 'three');
 ```json
 {
     "status": "complete",
-   "modifiedCount": 1,
+    "modifiedCount": 1,
     "matchCount": 1,
     "processed": [
         {
@@ -225,7 +256,7 @@ POST /data/update/arrayPk/0.1.0
     },
     "update": [
         "$append": {
-            "arrayStringWithPk": []
+            "arrayStringWithPk": ["wrong"]
         },
         "$set": { "field": "arrayStringWithPk.-1.s", "value": "four" },
         "$set": { "field": "arrayStringWithPk.-1.id","value": 4 }
@@ -249,6 +280,81 @@ VALUES (4,123456, 'four');
 ## Script
 
 ```
+[
+    {
+        "operation": "update_row",
+        "table": "BASE",
+        "columns": [
+            "$modified_columns"
+        ]
+    },
+    {
+        "foreach": {
+            "field": "arrayStringWithPk",
+            "elem": "$x",
+            "do": [
+                {
+                    "operation": "select_row",
+                    "table": "ARRAY_STRING_WITH_PK",
+                    "columns": [
+                        "$all_columns",
+                        {
+                            "column": "base_id"
+                        }
+                    ],
+                    "where": {
+                        "q": "base_id=? and id=?",
+                        "bindings": [
+                            {
+                                "value": 123456
+                            },
+                            {
+                                "field": "$x.id"
+                            }
+                        ]
+                    },
+                    "returning": {
+                        "elem": "$r"
+                    }
+                },
+                {
+                    "operation": "insert_row",
+                    "table": "ARRAY_STRING_WITH_PK",
+                    "conditions": [
+                        {
+                            "isEmpty": "$r"
+                        }
+                    ],
+                    "columns": [
+                        "$not_null_columns",
+                        {
+                            "column": "base_id",
+                            "field": "$parent._id"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "operation": "delete_row",
+        "table": "ARRAY_STRING_WITH_PK",
+        "where": {
+            "q": "base_id=? and id not in (?)",
+            "bindings": [
+                {
+                    "value": 123456
+                },
+                {
+                    "array": "arrayStringWithPk.*.id"
+                }
+            ]
+        }
+    }
+]
+```
+
+```
 [  { update_row : { table: BASE, columns: [ $modified_columns ] } },
    { collection_update : { field : arrayStringWithPk, 
                            table: ARRAY_STRING_WITH_PK, 
@@ -265,6 +371,7 @@ VALUES (4,123456, 'four');
                                                                                                      {field:id}]} } } } }
 ]
 ```
+
 
 ## lightblue response
 ```json
@@ -319,11 +426,33 @@ SELECT * FROM BASE A JOIN ARRAY_STRING_WITH_PK B ON A.ID=B.BASE_ID WHERE A.ID=12
 
 ## Script
 
-```
-{ select : { project: [ $all_columns ],
-             join: [ { "A":"BASE"}, {"B":"ARRAY_STRING_WITH_PK"} ],
-             where : { sql: "A._ID = ?", bindings: [ _id ]  }
-           } }
+```json
+[
+    {
+        "operation": "select_row",
+        "tables": [
+            {
+                "name": "base",
+                "alias": "a"
+            },
+            {
+                "name": "ARRAY_STRING_WITH_PK",
+                "alias": "b"
+            }
+        ],
+        "columns": [
+            "$all_columns"
+        ],
+        "where": {
+            "q": "a.id=b.base_id and a.id=?",
+            "bindings": [
+                {
+                    "value": 123456
+                }
+            ]
+        }
+    }
+]
 ```
 
 ## lightblue response
@@ -366,7 +495,7 @@ POST /data/delete/arrayPk/0.1.0
 
 ## generated SQL
 ```sql
-DELETE FROM ARRAY_STRING_WITHOUT_PK
+DELETE FROM ARRAY_STRING_WITH_PK
 WHERE BASE_ID=123456;
 
 DELETE FROM BASE
@@ -374,9 +503,33 @@ WHERE ID=123456;
 ```
 
 ## Script
-```
-[ { delete_row: { table: ARRAY_STRING_WITHOUT_PK, where: { sql: "BASE_ID=?", bindings:[123456]} } },
-  { delete_row: { table: BASE, where: { sql: "ID=?", bindings:[123456] } } } ]
+```json
+[
+    {
+        "operation": "delete_row",
+        "table": "ARRAY_STRING_WITH_PK",
+        "where": {
+            "q": "base_id=?",
+            "bindings": [
+                {
+                    "value": 123456
+                }
+            ]
+        }
+    },
+    {
+        "operation": "delete_row",
+        "table": "BASE",
+        "where": {
+            "q": "id=?",
+            "bindings": [
+                {
+                    "value": 123456
+                }
+            ]
+        }
+    }
+]
 ```
 
 ## lightblue response
