@@ -41,8 +41,8 @@ For field mappings, it might be useful to have a mechanism to define further cus
         "rdbms": {
             "table": "tableName",
             "column": "columnName",
-            "readFilter": "'?'",
-            "writeFilter": "'?'"
+            "readFilter": "?",
+            "writeFilter": "?"
         }
     }
 }
