@@ -164,9 +164,7 @@ VALUES (123456, 'three');
     {
         "foreach": {
             "field": "arrayStringWithoutPk",
-            "element": {
-                "field": "$x"
-            },
+            "element": "x"
             "do": [
                 {
                     "operation": "insert_row",
@@ -174,7 +172,7 @@ VALUES (123456, 'three');
                     "columns": [
                         {
                             "column": "s_field",
-                            "field": "$x"
+                            "var": "x"
                         },
                         {
                             "column": "base_id",
@@ -262,7 +260,7 @@ VALUES (123456, 'four');
     {
         "foreach": {
             "field": "arrayStringWithoutPk",
-            "element": "$x",
+            "element": "x",
             "do": [
                 {
                     "operation": "select_row",
@@ -280,12 +278,12 @@ VALUES (123456, 'four');
                                 "field": "$parent._id"
                             },
                             {
-                                "field": "$x"
+                                "var": "x"
                             }
                         ]
                     },
                     "returning": {
-                        "elem": "$r"
+                        "var": "r"
                     }
                 },
                 {
@@ -293,13 +291,13 @@ VALUES (123456, 'four');
                     "table": "ARRAY_STRING_WITHOUT_PK",
                     "conditions": [
                         {
-                            "isEmpty": "$r"
+                            "isEmpty": { "var" :"r" }
                         }
                     ],
                     "columns": [
                         {
                             "column": "s_field",
-                            "field": "$x"
+                            "var": "x"
                         },
                         {
                             "column": "base_id",
@@ -323,12 +321,12 @@ VALUES (123456, 'four');
                     "field": "$parent._id"
                 },
                 {
-                    "field": "$x"
+                    "var": "x"
                 }
             ]
         },
         "returning": {
-            "array": "$y"
+            "array": "y"
         }
     },
     {
