@@ -288,87 +288,37 @@ VALUES (4,123456, 'four');
             "$modified_columns"
         ]
     },
-    {
-        "foreach": {
-            "field": "arrayStringWithPk",
-            "elem": "$x",
-            "do": [
-                {
-                    "operation": "select_row",
+    {   "operation":"collection_update",
+        "field" : "arrayStringWithPk", 
+        "retrieval": { 
+            "operation":"select",
+            "join":"ARRAY_STRING_WITH_PK", 
+            "project" : [ "$all_columns", { "column": "base_id" } ],
+            "where" : { "q": "base_id=?", 
+                        "bindings": [ { "field":"$parent._id" } ] } 
+        },
+        "inserted_rows": { 
+                    "operation":"insert_row",
+                    "table": "ARRAY_STRING_WITH_PK", 
+                    "columns": [ {"field":"s"}, {"field":"id"},  
+                                 {"column":"base_id","field":"$parent._id"}]
+        },
+        "updated_rows": { 
+                    "operation":"update_row",
+                    "table": "ARRAY_STRING_WITH_PK", 
+                    "columns":["$modified_columns"],
+                    "where": {"q": "base_id=? and id=?",  
+                              "bindings":[{"field":"$parent._id"}, 
+                                          {"field":"id"}]} }
+        },
+        "deleted_rows": { 
+                    "operation":"delete_row",
                     "table": "ARRAY_STRING_WITH_PK",
-                    "columns": [
-                        "$all_columns",
-                        {
-                            "column": "base_id"
-                        }
-                    ],
-                    "where": {
-                        "q": "base_id=? and id=?",
-                        "bindings": [
-                            {
-                                "value": 123456
-                            },
-                            {
-                                "field": "$x.id"
-                            }
-                        ]
-                    },
-                    "returning": {
-                        "elem": "$r"
-                    }
-                },
-                {
-                    "operation": "insert_row",
-                    "table": "ARRAY_STRING_WITH_PK",
-                    "conditions": [
-                        {
-                            "isEmpty": "$r"
-                        }
-                    ],
-                    "columns": [
-                        "$not_null_columns",
-                        {
-                            "column": "base_id",
-                            "field": "$parent._id"
-                        }
-                    ]
-                }
-            ]
-        }
-    },
-    {
-        "operation": "delete_row",
-        "table": "ARRAY_STRING_WITH_PK",
-        "where": {
-            "q": "base_id=? and id not in (?)",
-            "bindings": [
-                {
-                    "value": 123456
-                },
-                {
-                    "array": "arrayStringWithPk.*.id"
-                }
-            ]
-        }
-    }
-]
-```
-
-```
-[  { update_row : { table: BASE, columns: [ $modified_columns ] } },
-   { collection_update : { field : arrayStringWithPk, 
-                           table: ARRAY_STRING_WITH_PK, 
-                           retrieval: { $select : { from : ARRAY_STRING_WITH_PK, 
-                                                    columns : [ $all_columns, { column: base_id } ],
-                                                    where : { q: "base_id=?", bindings: [ { field:$parent._id } ] } } },
-                           inserted_rows: { insert_row : { table: ARRAY_STRING_WITH_PK, 
-                                               columns: [ {field:s}, {field:id}, {column:base_id,field:$parent._id}]} },
-                           updated_rows: { update_row: {table: ARRAY_STRING_WITH_PK, columns[$modified_columns],
-                                                        where: {q: "base_id=? and id=?", bindings:[{field:$parent._id}, 
-                                                                                                   {field:id}]} }},
-                           deleted_rows: { delete_row: {table: ARRAY_STRING_WITH_PK,
-                                                        where: { q: "base_id=? and id=?", bindings: [{field:$parent._id}, 
-                                                                                                     {field:id}]} } } } }
+                    "where": { "q": "base_id=? and id=?", 
+                               "bindings": [{"field":"$parent._id"},
+                                            {"field":"id"}]} 
+        } 
+     }
 ]
 ```
 

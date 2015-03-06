@@ -257,87 +257,39 @@ VALUES (123456, 'four');
             "$modified_columns"
         ]
     },
-    {
-        "foreach": {
-            "field": "arrayStringWithoutPk",
-            "element": "x",
-            "do": [
-                {
-                    "operation": "select_row",
-                    "table": "ARRAY_STRING_WITHOUT_PK",
-                    "columns": [
-                        "$all_columns",
-                        {
-                            "column": "base_id"
-                        }
-                    ],
-                    "where": {
-                        "q": "base_id=? and s_field=?",
-                        "bindings": [
-                            {
-                                "field": "$parent._id"
-                            },
-                            {
-                                "var": "x"
-                            }
-                        ]
-                    },
-                    "returning": {
-                        "var": "r"
-                    }
-                },
-                {
-                    "operation": "insert_row",
-                    "table": "ARRAY_STRING_WITHOUT_PK",
-                    "conditions": [
-                        {
-                            "isEmpty": { "var" :"r" }
-                        }
-                    ],
-                    "columns": [
-                        {
-                            "column": "s_field",
-                            "var": "x"
-                        },
-                        {
-                            "column": "base_id",
-                            "field": "$parent._id"
-                        }
-                    ]
-                }
-            ]
-        }
-    },
-    {
-        "operation": "delete_row",
-        "table": "ARRAY_STRING_WITHOUT_PK",
-        "where": {
-            "q": "base_id=? and S_FIELD not in (?)",
-            "bindings": [
-                {
-                    "field": "$parent._id"
-                },
-                {
-                    "array": "arrayStringWithoutPk.*"
-                }
-            ]
-        }
+    {   "operation": "collection_update",
+        "collection" : "arrayStringWithoutPk", 
+        "retrieval": { 
+             "operation" : "select",
+             "join": "ARRAY_STRING_WITHOUT_PK", 
+             "project": [ "$all_columns", { "column": "base_id" } ],
+             "where" : { 
+                    "q": "base_id=?", 
+                    "bindings": [ { "field":"$parent_id" } ] } 
+         },
+         "inserted_rows": { 
+             "operation":"insert_row",
+             "table": "ARRAY_STRING_WITHOUT_PK", 
+             "columns"["$all_columns"]
+         },
+         "updated_rows": { 
+             "operation":"update_row",
+             "table": "ARRAY_STRING_WITHOUT_PK", 
+             "columns":["$modified_columns"],
+             "where": {
+                    "q": "base_id=? and S_FIELD=?", 
+                    "bindings":[{"field":"$parent._id"}, {"field":"x"}]
+             }
+         },
+         "deleted_rows": { 
+             "operation":"delete_row",
+             "table": "ARRAY_STRING_WITHOUT_PK",
+             "where": { 
+                    "q": "base_id=? and S_FIELD=?", 
+                    "bindings": [{"field":"$parent._id"}, {"field":"x"}]
+             }
+         }
     }
-]
-```
-```
-[  { update_row : { table: BASE, columns: [ $modified_columns ] } },
-   { collection_update : { field : arrayStringWithoutPk, 
-                           table: ARRAY_STRING_WITHOUT_PK, 
-                           retrieval: { $select : { from : ARRAY_STRING_WITHOUT_PK, 
-                                                    columns : [ $all_columns, { column: base_id } ],
-                                                    where : { q: "base_id=?", bindings: [ { field:$parent_id } ] } } },
-                           inserted_rows: { insert_row : { table: ARRAY_STRING_WITHOUT_PK, columns[$all_columns]} },
-                           updated_rows: { update_row: {table: ARRAY_STRING_WITHOUT_PK, columns[$modified_columns],
-                                                        where: {q: "base_id=? and S_FIELD=?", bindings:[{field:$parent._id}, {field:x}]} }},
-                           deleted_rows: { delete_row: {table: ARRAY_STRING_WITHOUT_PK,
-                                                        where: { q: "base_id=? and S_FIELD=?", bindings: [{field:$parent._id}, {field:x}]} } } } }
-]
 ```
 
 ## lightblue response
