@@ -5,12 +5,17 @@ A script contains one or more statements:
 script := statement | [ statement, statement, ... ]
 ```
 
-A statement has a name, and arguments:
+
 ```
-statement := { name : { args } }
+statement := operation | conditional | iteration 
 ```
 
-Arguments may contain scripts.
+```
+operation := { "operation" : "operationName", args... } |
+conditional :=  { "conditional" : test, "true": script, "false": script }
+iteration := { "iteration" : collection, "do": script }
+               
+```
 
 Each statement represents an algorithm that can be invoked to perform
 an operation. This algorithm can be the execution of a SQL statement,
@@ -18,56 +23,57 @@ or execution of a particular logic that involves multiple SQL
 statements. 
 
 
-## Column/Field References
+## Column/Field/Variable References
 
 For statements requiring values, columns, fields, temporary variables, or values can be used.
+
+|Expression|L-value|R-value|
+|-|-|-|
+|field: fieldName|+|+|
+|column: columnName|+|+|
+|var: varName|+|+|
+|value: v|-|+|
+
 
 ### Field reference
 ```
 { field: fieldName }
 ```
-When read, reads the field value. When written, writes the field value. 
-The field table/column mappings are used to determine which column is used.
-
-```
-{ field: fieldName, value: value }
-```
-Invalid for reads. When written, sets the field value to 'value'.
-
+Value of the expression is the value of the field. Can be used as a L-value or R-value.
 
 ### Column reference
 ```
+{ column: columnName }
 { column: columnName, field: fieldName }
+{ column: columnName, var: varName }
 ```
-When read, reads the column and sets the fieldName to that value. 
-When written, reads fieldName and sets the column value.
+Value of the expression is the value of the column. When used as a L-value, sets the field/var value as well. When used as a R-value, column value is first set to field/variable value.
 
 ```
-{ column: columnName, value: value }
+{ column: columnName, value: v }
 ```
-Invalid for reads. When written, sets the column to value.
+This can only be used as an R-value, and sets column value to 'v'.
+
+## SQL clauses
+SQL clauses are the building blocks of SQL statements.
+```
+clause := { "q": clause, "bindings":[ binding, ... ] }
+```
+The 'clause' is a string optionally containing value markers '?'. Each value in the 'bindings' will be assigned to the matching '?'. Each binding is a field, value, or variable.
 
 ```
-{ column: columnName, variable: varName }
+binding := { field/variable "out": true }
 ```
-When read, read the colum and sets the temporary variable 'varName'.
-When written, sets the column value from the temporary variable 'varName'.
+The optional 'out' attribute determines if the binding is an OUT binding. OUT bindings read value from the executed statement and sets the field/variable. By default all bindings are IN bindings.
 
-For all the above cases, optionally a sql clause can be specified:
+## Field/Column lists
+SQL statements get a list of fields/columns to operate on. These lists can contain field and/or column references:
+```
+ columns: [ column-reference, field-reference,... ]
+```
+A column reference directly identifies a column. For field references, the column mapping of the field is used.
 
-```
-{ field: fieldName, sql:sqlClause }
-```
-Uses the sqlClause to read/write the column. The sql clause must have one '?'. Note that for all above cases where sql is not specified, sql defaults to '?'.
-
-```
-{ sql: sqlClause, bindings: [ binding,... ] }
-```
-Uses sqlClause to read/write a column or columns, and associates that value(s) with the bindings. Bindings can be:
-
-  - { field: fieldName }
-  - { variable: variableName }
-  - { value: value }
+The following keywords can also be used:
 
 * $non-null-fields is an array [ {field: fieldName } ] containing all non-null fields for the current table
 * $all-fields is an array [ {field:fieldName} ] containing all the fields for the current table
@@ -76,24 +82,6 @@ Uses sqlClause to read/write a column or columns, and associates that value(s) w
 * For INSERT operations, field references refer to the document being inserted.
 * For UPDATE operations, two pseudo-fields are defined: '$new' and '$old'. '$new' refers to the document containing the values that will be written. '$old' refers to the values that are in the database before the update. '$new.x' refers to the new value of field 'x', and '$old.x' refers to the value of 'x' in the db before the update operation. Unqualified references assume '$new', i.e. 'x' will refer to '$new.x'.
 * DELETE operations only assume that the unique identifiers for the entity are known. If more information is necessary to delete any associated data in other tables, the DELETE script should read them.
-
-### Bindings
-
-SQL clauses include bindings. For every '?' in the clause, there must be one binding.
-```
-{ sql: "column=?", bindings:[ {field:f} ]  }
-```
-Bindings can be one of the following:
-```
-{ value: "xyx" }
-{ value: 123 }
-{ field: fieldName }
-{ variable: varName }
-```
-By default, the value represented by the binding is an IN parameter, that is, the value is substituted into the SQL statement. OUT parameters can be used as well:
-```
- { field: fieldName, out:true }
-```
 
 ## Statements
 
