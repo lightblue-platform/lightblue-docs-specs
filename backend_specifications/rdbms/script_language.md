@@ -191,7 +191,11 @@ Runs the `query`, and assigns the result set of the query to `variableName`. Tha
 ### conditionals
 
 ```
-{ ifempty: var, then: { ... }, else: {...} }
+{ "conditional" : { "test": { testScript }, "then":[...], "else":[...] } }
+```
+For instance:
+```
+{ "conditional": { "test": { "empty":"var" }, "then": thenScript, "else": elseScript } }
 ```
 If 'var' is empty, runs 'then' script, otherwise 'else' script. 'var' can be a resultset or an array field.
 
