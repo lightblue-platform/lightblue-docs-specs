@@ -291,6 +291,54 @@ VALUES (123456, 'four');
          }
     }
 ```
+Another option:
+```
+    {
+        "operation": "update_row",
+        "table": "BASE",
+        "columns": [
+            "$modified_columns"
+        ]
+    },
+    {   "operation": "collection_update",
+        "collection" : "arrayStringWithoutPk", 
+        "retrieval": { 
+             "operation" : "select",
+             "join": "ARRAY_STRING_WITHOUT_PK", 
+             "project": [ "$all_columns", { "column": "base_id" } ],
+             "where" : { 
+                    "q": "base_id=?", 
+                    "bindings": [ { "field":"$parent_id" } ] } 
+         },
+         "inserted_rows" : "ins",
+         "updated_rows": "upd", 
+         "deleted_rows" : "del" },
+     { "foreach" : "ins", "elem":"x", "do": {
+             "operation":"insert_row",
+             "table": "ARRAY_STRING_WITHOUT_PK", 
+             "columns":["$all_columns"]
+             }
+     },
+     { "foreach": "upd", "elem":"x", "do": {
+             "operation":"update_row",
+             "table": "ARRAY_STRING_WITHOUT_PK", 
+             "columns":["$modified_columns"],
+             "where": {
+                    "q": "base_id=? and S_FIELD=?", 
+                    "bindings":[{"field":"$parent._id"}, {"field":"x"}]
+             }
+         }
+      },
+      { "foreach" : "del", "elem":"x", "do": {
+             "operation":"delete_row",
+             "table": "ARRAY_STRING_WITHOUT_PK",
+             "where": { 
+                    "q": "base_id=? and S_FIELD=?", 
+                    "bindings": [{"field":"$parent._id"}, {"field":"x"}]
+             }
+         }
+       }
+```
 
 ## lightblue response
 ```json
