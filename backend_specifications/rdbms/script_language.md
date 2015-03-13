@@ -19,14 +19,14 @@ For each different operation, scripts execute with a set of variables accessible
 are the variables that are predefined for each operation.
 
 * Insert
-  * document: The document being inserted.
+  * $document: The document being inserted.
 * Update
-  * document: The new copy of the document. 
-  * olddocument: The unmodified copy of the document. Fields of olddocument are read-only.
+  * $document: The new copy of the document. 
+  * $olddocument: The unmodified copy of the document. Fields of olddocument are read-only.
 * Delete
-  * docid : The unique ID pf the document that's being deleted. If the unique ID is an object, docid is an object as well. Fields of docid are read-only
+  * $docid : The unique ID pf the document that's being deleted. If the unique ID is an object, docid is an object as well. Fields of docid are read-only
 * Read
-  * document: The document being read
+  * $document: The document being read
 
 Variables are untyped. They get the type of the object they're assigned to. A new variable is created the first time a unique variable name is written.
 
@@ -131,7 +131,8 @@ This procedure inserts a row to a table using the current document.
 ```
 { select : { project: [ col1, col2, {var: document.field },  ... ],
              distinct: true|false,
-             join: { tables: [ { "alias": alias, "table": table, outerJoin: false },...], on: { clause: "criteria", bindings:[...] } },
+             join: { tables: [ { "alias": alias, "table": table, outerJoin: false },...], on: { clause: "criteria", bindings:[...] } } |
+             table: "table",
              where: { clause: "criteria", bindings: [...] },
              sort: [ { column: col, ascending: true}, { var: field, ascending: true} .,,, ],
              resultSet: varName } }
@@ -168,21 +169,21 @@ will contain an element of 'arr', and all non-null fields of 'x' will be inserte
 
 ### collection_update
 
-{ collection_update : { field: <collectionField>,
-                        table: <tableName>,
+{ collection_update : { collection: <collectionField>,
                         retrieval: <sql script that retrieves the collection>,
-                        inserted_rows: <Script that will be called for each inserted row>,
-                        updated_rows: <Script that will be called for each updated row>,
-                        deleted_rows: <Script that will be called for each deleted row>
+                        inserted_rows: <Script that will be called for each inserted row, or variable>,
+                        updated_rows: <Script that will be called for each updated row, or variable>,
+                        deleted_rows: <Script that will be called for each deleted row, or variable>,
                         } 
 }
 ```
 
 This does the following:
-  - Using 'retrieval' criteria,  retrieves a collection of rows from table 'tableName'
+  - Using 'retrieval' criteria,  retrieves a collection of rows 
   - Computes a list of inserted rows, updated rows, and deleted rows by comparing the 
     loaded collection and 'collectionField'
-  - inserts/updates/deletes rows using the scripts
+  - inserts/updates/deletes rows using the scripts, or assigns those lists to the variables
+    - If a script is used, script can access the current row using '$currentrow'
 
 
 ### conditionals

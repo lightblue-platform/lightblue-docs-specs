@@ -29,10 +29,7 @@ defined in metadata.
 ```
    join: { tables: [t1, t2,...], on:{ ... } }
 ```
- - Aliasing: to assign the alias X to a table T:
-```
-  { "X":"T" }
-```
+All tables should be aliased.
    
  - Generate join criteria:
    - If t1 and t2 are included in join and t1 has a FK referencing to t2:
@@ -115,3 +112,7 @@ Example:
 ## Update/Save generation
 
 Save is implemented as an update of all fields, so only update generation will be handled.
+
+Algorithm is the same for insertion, with the difference that instead
+of inserting rows for associated entities, collection_update should be
+used.
