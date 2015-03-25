@@ -218,74 +218,28 @@ VALUES (100, 300);
 The script below assumes elements of 'b' are looked up, and inserted if not found.
 ```json
 [
-    {
-        "operation": "insert_row",
-        "table": "table_a",
-        "columns": [
-            "$non_null_fields"
-        ]
-    },
-    {
-        "foreach": {
-            "field": "b",
-            "elem": "$x",
+    {   "$set": "$tables.table_a", "var":"$document" },
+    {   "insert_row" : { "table": "table_a" } },
+    {   "foreach": {
+            "field": "$document.b",
+            "elem": "x",
             "do": [
-                {
-                    "operation": "select_row",
-                    "table": "table_b",
-                    "columns": [
-                        "$all_columns",
-                        {
-                            "column": "base_id"
-                        }
-                    ],
-                    "where": {
-                        "q": "id=?",
-                        "bindings": [
-                            {
-                                "field": "$x.id"
-                            }
-                        ]
-                    },
-                    "returning": {
-                        "elem": "$r"
-                    }
-                },
-                {
-                    "operation": "insert_row",
-                    "table": "TABLE_B",
-                    "conditions": [
-                        {
-                            "isEmpty": "$r"
-                        }
-                    ],
-                    "columns": [
-                        {
-                            "column": "id",
-                            "field": "$x.id"
-                        },
-                        {
-                            "column": "b_field",
-                            "field": "$x.b"
-                        }
-                    ]
-                },
-                {
-                    "operation": "insert_row",
-                    "table": "MAP_A_B",
-                    "columns": [
-                        {
-                            "column": "a_id",
-                            "field": "$parent.id"
-                        },
-                        {
-                            "column": "b_id",
-                            "field": "$x.b"
-                        }
-                    ]
+                { "$set": "result", "valueof":{ "select" : { "table": "table_b",
+                                                "project": [ {"column":"base_id"} ],
+                                                "where": { "clause": "id=?",
+                                                           "bindings": ["$x.id"] } } } },
+                { "conditional" : { "test": { "isempty":"$result"}},
+                      {"then":  [
+                             { "$set":"$tables.TABLE_B", "var":"x" },
+                             { "insert_row": {  "table": "TABLE_B" } },
+                             { "$set":"$tables.MAP_A_B.a_id", "var":"$document.id" },
+                             { "$set":"$tables.MAP_A_B.b_id", "var":"x.id"},
+                             { "insert_row": { "table" : "MAP_A_B" } }
+                             ]
+                      }
+                }
                 }
             ]
-        }
     }
 ]
 ```

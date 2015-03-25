@@ -144,34 +144,15 @@ END
 
 ```
 [
-    {
-        "operation": "insert_row",
-        "table": "base",
-        "columns": [
-            "$not_null_columns"
-        ],
-        "returning": {
-            "column": "id",
-            "field": "id"
-        }
-    },
-    {
-        "foreach": {
+    { "execute_sql" : { "clause":"insert into base (a_field) values (?) returning id into ?", 
+                        "bindings" : [ "$document.a", { "var":"$document.id","out":"true" } ] } },
+    { "foreach": {
             "field": "subDocument",
-            "object": "$x",
+            "object": "x",
             "do": [
-                {
-                    "operation": "insert_row",
-                    "table": "sub_document",
-                    "columns": [
-                        "$not_null_columns",
-                        {
-                            "column": "base_id",
-                            "field": "$parent.id"
-                        }
-                    ]
-                }
-            ]
+                { "$set": "$tables.SUB_DOCUMENT","var":"x"},
+                { "$set": "$tables.SUB_DOCUMENT.base_id", "var":"$document.id" }
+                 ]
         }
     }
 ]

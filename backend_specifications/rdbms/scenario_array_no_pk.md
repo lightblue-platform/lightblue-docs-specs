@@ -154,32 +154,15 @@ VALUES (123456, 'three');
 
 ```json
 [
-    {
-        "insert_row" : {
-               "table": "BASE",
-               "columns": [ "$non_null_fields" ]
-        }
-    },
-    {
-        "foreach": {
-            "field": "doc.arrayStringWithoutPk",
+    {   "$set": "$tables.BASE", "var":"$document" },
+    {   "insert_row" : { "table": "BASE" } },
+    {   "foreach": {
+            "field": "$document.arrayStringWithoutPk",
             "element": "x"
             "do": [
-                {
-                    "insert_row" : {
-                        "table": "ARRAY_STRING_WITHOUT_PK",
-                        "columns": [
-                            {
-                                "column": "s_field",
-                                "var": "x"
-                            },
-                            {
-                                "column": "base_id",
-                                "var": "x.$parent._id"
-                            }
-                        ]
-                    }
-                }
+                { "$set" : "$tables.ARRAY_STRING_WITHOUT_PK", "var":"x"),
+                { "$set" : "$tables.ARRAY_STRING_WITHOUT_PK.base_id", "var":"x.$parent._id"},
+                { "insert_row" : { "table": "ARRAY_STRING_WITHOUT_PK" } }
             ]
         }
     }
@@ -250,45 +233,32 @@ VALUES (123456, 'four');
  
 ```json
 [
-    {
-        "update_row" : {
-            "table": "BASE",
-            "columns": ["$modified_columns"  ]
-        },
-    },
-    {   "collection_update" : {
-            "collection" : "arrayStringWithoutPk", 
-            "retrieval": { 
-                 "select" : {
-                     "table": "ARRAY_STRING_WITHOUT_PK",
-                     "project": [ "$all_columns", { "column": "base_id" } ],
-                     "where" : { 
-                         "q": "base_id=?", 
-                         "bindings": [ { "var":"$document._id" } ] } 
+    { "$set": "$tables.BASE", "var":"$document" },
+    { "update_row" : { "table": "BASE" } },
+    { "collection_update" : {
+            "newcollection" : "$document.arrayStringWithoutPk", 
+            "oldcollection": "$olddocument.arrayStringWithoutPk", 
+            "inserted_rows": [ 
+                  { "$set":"$tables.ARRAY_STRING_WITHOUT_PK", "var":"$row" },
+                  { "insert_row" : { "table": "ARRAY_STRING_WITHOUT_PK" } }
+            ],
+            "updated_rows": [
+                  { "$set":"$tables.ARRAY_STRING_WITHOUT_PK", "var":"$row" },
+                  { "update_row" : {
+                         "table": "ARRAY_STRING_WITHOUT_PK", 
+                         "where": {
+                              "clause": "base_id=? and S_FIELD=?", 
+                              "bindings":[ "$row.$parent._id", "$oldrow"]
+                          }
+                     }
                   }
-            },
-            "inserted_rows": { 
-                 "insert_row" : {
-                     "table": "ARRAY_STRING_WITHOUT_PK", 
-                     "columns":["$all_columns"]
-                 }
-            },
-            "updated_rows": { 
-                 "update_row" : {
-                     "table": "ARRAY_STRING_WITHOUT_PK", 
-                     "columns":["$modified_columns"],
-                     "where": {
-                           "q": "base_id=? and S_FIELD=?", 
-                           "bindings":[{"var":"$currentrow.$parent._id"}, {"var":"$currentrow"}]
-                      }
-                 }
-             },
+             ],
              "deleted_rows": { 
                  "delete_row" : {
                      "table": "ARRAY_STRING_WITHOUT_PK",
                      "where": { 
-                            "q": "base_id=? and S_FIELD=?", 
-                            "bindings": [{"field":"$currentrow.$parent._id"}, {"field":"$currentrow"}]
+                            "clause": "base_id=? and S_FIELD=?", 
+                            "bindings": ["$row.$parent._id", "$row"]
                      }
                  }
              }
@@ -480,8 +450,8 @@ WHERE ID=123456;
         "delete_row" : {
             "table": "ARRAY_STRING_WITHOUT_PK",
             "where": {
-                "q": "base_id=?",
-                "bindings": [ {"var": "$docid" } ]
+                "clause": "base_id=?",
+                "bindings": [ "$docid" ]
              }
         }
     },
@@ -489,8 +459,8 @@ WHERE ID=123456;
         "delete_row" : {
             "table": "BASE",
             "where": {
-                "q": "id=?",
-                "bindings": [ { "var": "$docid" } ]
+                "clause": "id=?",
+                "bindings": [ "$docid" ]
             }
         }
     }
