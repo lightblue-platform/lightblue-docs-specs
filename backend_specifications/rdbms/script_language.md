@@ -5,21 +5,21 @@ assemble an algorithm that performs a database operation using
 predefined algorithm components. Each script component is a Java class
 implementing a particular logic.
 
-A script contains one or more statements:
+A script contains one or more operations:
 ```
-script := statement | [ statement, statement, ... ]
+script := operation | [ operation, operation, ... ]
 ```
 
-A statement has an operation name, and arguments:
+An operation has an operation name, and arguments:
 ``` 
-statement := { operationName : { args } }
+operation := { operationName : { args } }
 ```
 
-Each statement represents an algorithm that can be invoked to perform
+Each operation represents an algorithm that can be invoked to perform
 an operation. This algorithm can be the execution of a SQL statement,
 or execution of a particular logic. 
 
-A statement returns a value that can be assigned to a variable. 
+An operation returns a value that can be assigned to a variable. 
 
 ## Variables
 For each different operation, scripts execute with a set of variables accessible to them. These
@@ -114,7 +114,7 @@ The following keywords can also be used:
 * $document.$all-fields is an array [ {var:varName} ] containing all the fields for the current table
 * $document.$all-modified-fields is an array [ {var:varName} ] containing all the modified fields for the current table
 
-## Statements
+## Operations
 
 ### foreach
 
