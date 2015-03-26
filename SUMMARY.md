@@ -37,6 +37,8 @@
    * [MongoDB](backend_specifications/mongodb/README.md)
        * [Metadata](backend_specifications/mongodb/metadata.md)
    * [RDBMS](backend_specifications/rdbms/README.md)
+       * [Script Language](backend_specifications/rdbms/script_language.md)
+       * [Script Generation](backend_specifications/rdbms/script_generation.md)
        * [Controller Design](backend_specifications/rdbms/controller_design.md)
            * [Data Types](backend_specifications/rdbms/data_types.md)
            * [Data Structures](backend_specifications/rdbms/data_structures.md)
