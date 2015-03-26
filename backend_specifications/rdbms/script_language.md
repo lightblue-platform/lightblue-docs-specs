@@ -47,13 +47,17 @@ varName
 ```
 Value of the expression is the value of the variable. Can be used as a L-value or R-value.
 
+An L-value is an expression to which a value can be assigned (can appear on the LEFT side of an assignment operator).
+
+An R-value is an expression whose value can be read.
+
 ### Column reference
 ```
 { column: columnName }
 { column: columnName, var: varName }
 ```
 Value of the expression is the value of the column. When used as an L-value, sets the var value as well. When used as a R-value, column value is first set to variable value.
-TODO clarify L-value vs R-value with examples, not sure what you mean as-is.
+
 
 ```
 { column: columnName, value: v }
@@ -241,12 +245,12 @@ TODO document what testScript can be!
 Executes a SQL statement. `bindings` are IN or OUT parameters to the
 SQL statement. `resultBindings` are bindings to the columns of the
 result set of the operation, if it has a result set and that result
-set has at most one row. If the result has has more rows, an exception
-is thrown. Order of bindings and resultbindings are important,
-bindings order has to match the markers '?' and resultbindings order
-has to match the columns.
+set has at most one row. If the result has has more rows and
+resultBindings is used, an exception is thrown. Order of bindings and
+resultbindings are important, bindings order has to match the markers
+'?' and resultbindings order has to match the columns.
 
-QUESTION why limit result set to a single row?
+For queries involving many results, assign the operation to a variable.
 
 
 ### insert_row
@@ -295,11 +299,7 @@ where: { clause:"id=? and active=?", bindings: [ $document.id, {value:true}] }
              sort: [ { column: col, ascending: true}, { var: field, ascending: true}, ... ] }
 ```
 
-Builds a select statement. The columns must refer to the tables in the
-join statement. If the tables in the join statement are aliased, the
-projection columns must also use the aliased names.
-
-QUESTION What are "the columns" referred to above?  The project object?  Why does "project" have clauses, that's covered by "join" and "where".
+Builds a select statement. The projected columns are derived from the projected variables. If custom clauses are used, those clauses should use the same aliases for the tables as they are defined in the join. The clauses should be used to project columns that are not mapped to a variable.
 
 ### update_collection 
 
