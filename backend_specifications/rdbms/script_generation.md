@@ -4,6 +4,8 @@ The default operation mode of the RDBMS module is to generate SQL
 scripts based on the field/column mappings and foreign key information
 declated in the metadata.
 
+Note: We are not talking about script text generation. The output of the script generator is an executable script object tree.
+
 ## Query Generation
 
 Query  generation takes a  projection, query,  and sort  criteria, and
@@ -14,7 +16,7 @@ defined in metadata.
  - Build a set of fields to retrieve using the projection, query, and sort criteria in the request
  - Build a projection clause:
 ```
-   project: { {field:field1}, {field:field2}, ... }
+   project: { var1, var2, ... }
 ```
  - The projection clause uses the readFilters for each field
 
@@ -29,10 +31,7 @@ defined in metadata.
 ```
    join: { tables: [t1, t2,...], on:{ ... } }
 ```
- - Aliasing: to assign the alias X to a table T:
-```
-  { "X":"T" }
-```
+All tables should be aliased.
    
  - Generate join criteria:
    - If t1 and t2 are included in join and t1 has a FK referencing to t2:
@@ -108,10 +107,15 @@ Override the table insert default procedure.
 
 Example:
 ```
-  insert: [    { sql : { sql: "select seq.next from dual", resultbinding: [ _id ] } },
-               { insert_row : { table: BASE } } ]
+  { insert_row : [    
+       { execute_sql : { clause: "select seq.next from dual", resultBindings: [ $document._id ] } },
+       { insert_row : { table: BASE } } ]
 ```
 
 ## Update/Save generation
 
 Save is implemented as an update of all fields, so only update generation will be handled.
+
+Algorithm is the same for insertion, with the difference that instead
+of inserting rows for associated entities, collection_update should be
+used.

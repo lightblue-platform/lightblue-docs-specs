@@ -154,32 +154,15 @@ VALUES (123456, 'three');
 
 ```json
 [
-    {
-        "operation": "insert_row",
-        "table": "BASE",
-        "columns": [
-            "$non_null_fields"
-        ]
-    },
-    {
-        "foreach": {
-            "field": "arrayStringWithoutPk",
+    {   "$set": "$tables.BASE", "var":"$document" },
+    {   "insert_row" : { "table": "BASE" } },
+    {   "foreach": {
+            "field": "$document.arrayStringWithoutPk",
             "element": "x"
             "do": [
-                {
-                    "operation": "insert_row",
-                    "table": "ARRAY_STRING_WITHOUT_PK",
-                    "columns": [
-                        {
-                            "column": "s_field",
-                            "var": "x"
-                        },
-                        {
-                            "column": "base_id",
-                            "field": "$parent._id"
-                        }
-                    ]
-                }
+                { "$set" : "$tables.ARRAY_STRING_WITHOUT_PK", "var":"x"),
+                { "$set" : "$tables.ARRAY_STRING_WITHOUT_PK.base_id", "var":"x.$parent._id"},
+                { "insert_row" : { "table": "ARRAY_STRING_WITHOUT_PK" } }
             ]
         }
     }
@@ -247,97 +230,40 @@ VALUES (123456, 'four');
 ```
 
 ## Script
-
+ 
 ```json
 [
-    {
-        "operation": "update_row",
-        "table": "BASE",
-        "columns": [
-            "$modified_columns"
-        ]
-    },
-    {   "operation": "collection_update",
-        "collection" : "arrayStringWithoutPk", 
-        "retrieval": { 
-             "operation" : "select",
-             "join": "ARRAY_STRING_WITHOUT_PK", 
-             "project": [ "$all_columns", { "column": "base_id" } ],
-             "where" : { 
-                    "q": "base_id=?", 
-                    "bindings": [ { "field":"$parent_id" } ] } 
-         },
-         "inserted_rows": { 
-             "operation":"insert_row",
-             "table": "ARRAY_STRING_WITHOUT_PK", 
-             "columns"["$all_columns"]
-         },
-         "updated_rows": { 
-             "operation":"update_row",
-             "table": "ARRAY_STRING_WITHOUT_PK", 
-             "columns":["$modified_columns"],
-             "where": {
-                    "q": "base_id=? and S_FIELD=?", 
-                    "bindings":[{"field":"$parent._id"}, {"field":"x"}]
-             }
-         },
-         "deleted_rows": { 
-             "operation":"delete_row",
-             "table": "ARRAY_STRING_WITHOUT_PK",
-             "where": { 
-                    "q": "base_id=? and S_FIELD=?", 
-                    "bindings": [{"field":"$parent._id"}, {"field":"x"}]
+    { "$set": "$tables.BASE", "var":"$document" },
+    { "update_row" : { "table": "BASE" } },
+    { "collection_update" : {
+            "newcollection" : "$document.arrayStringWithoutPk", 
+            "oldcollection": "$olddocument.arrayStringWithoutPk", 
+            "inserted_rows": [ 
+                  { "$set":"$tables.ARRAY_STRING_WITHOUT_PK", "var":"$row" },
+                  { "insert_row" : { "table": "ARRAY_STRING_WITHOUT_PK" } }
+            ],
+            "updated_rows": [
+                  { "$set":"$tables.ARRAY_STRING_WITHOUT_PK", "var":"$row" },
+                  { "update_row" : {
+                         "table": "ARRAY_STRING_WITHOUT_PK", 
+                         "where": {
+                              "clause": "base_id=? and S_FIELD=?", 
+                              "bindings":[ "$row.$parent._id", "$oldrow"]
+                          }
+                     }
+                  }
+             ],
+             "deleted_rows": { 
+                 "delete_row" : {
+                     "table": "ARRAY_STRING_WITHOUT_PK",
+                     "where": { 
+                            "clause": "base_id=? and S_FIELD=?", 
+                            "bindings": ["$row.$parent._id", "$row"]
+                     }
+                 }
              }
          }
     }
-```
-Another option:
-```
-    {
-        "operation": "update_row",
-        "table": "BASE",
-        "columns": [
-            "$modified_columns"
-        ]
-    },
-    {   "operation": "collection_update",
-        "collection" : "arrayStringWithoutPk", 
-        "retrieval": { 
-             "operation" : "select",
-             "join": "ARRAY_STRING_WITHOUT_PK", 
-             "project": [ "$all_columns", { "column": "base_id" } ],
-             "where" : { 
-                    "q": "base_id=?", 
-                    "bindings": [ { "field":"$parent_id" } ] } 
-         },
-         "inserted_rows" : "ins",
-         "updated_rows": "upd", 
-         "deleted_rows" : "del" },
-     { "foreach" : "ins", "elem":"x", "do": {
-             "operation":"insert_row",
-             "table": "ARRAY_STRING_WITHOUT_PK", 
-             "columns":["$all_columns"]
-             }
-     },
-     { "foreach": "upd", "elem":"x", "do": {
-             "operation":"update_row",
-             "table": "ARRAY_STRING_WITHOUT_PK", 
-             "columns":["$modified_columns"],
-             "where": {
-                    "q": "base_id=? and S_FIELD=?", 
-                    "bindings":[{"field":"$parent._id"}, {"field":"x"}]
-             }
-         }
-      },
-      { "foreach" : "del", "elem":"x", "do": {
-             "operation":"delete_row",
-             "table": "ARRAY_STRING_WITHOUT_PK",
-             "where": { 
-                    "q": "base_id=? and S_FIELD=?", 
-                    "bindings": [{"field":"$parent._id"}, {"field":"x"}]
-             }
-         }
-       }
 ```
 
 ## lightblue response
@@ -521,27 +447,21 @@ WHERE ID=123456;
 ```json
 [
     {
-        "operation": "delete_row",
-        "table": "ARRAY_STRING_WITHOUT_PK",
-        "where": {
-            "q": "base_id=?",
-            "bindings": [
-                {
-                    "value": 123456
-                }
-            ]
+        "delete_row" : {
+            "table": "ARRAY_STRING_WITHOUT_PK",
+            "where": {
+                "clause": "base_id=?",
+                "bindings": [ "$docid" ]
+             }
         }
     },
     {
-        "operation": "delete_row",
-        "table": "BASE",
-        "where": {
-            "q": "id=?",
-            "bindings": [
-                {
-                    "value": 123456
-                }
-            ]
+        "delete_row" : {
+            "table": "BASE",
+            "where": {
+                "clause": "id=?",
+                "bindings": [ "$docid" ]
+            }
         }
     }
 ]

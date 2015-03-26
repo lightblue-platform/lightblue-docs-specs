@@ -23,6 +23,13 @@ The nuances of simple field mapping scenarios should be tested independently.  D
 
 ## Design Notes
 
+### Overview and Rationale
+The default mode of operation is to let the metadata maintainer define the tables, table relationships, and field/column mappings in metadata, and let the RDBMS controller generate the SQL operations required to manage data. However, since schemas are immutable, not all scenarios can be handled by a declarative method. To address the cases where the declarations are not sufficient, the RDBMS controller is designed as two layers:
+  * The lower layer contains a procedural script language where basic operations such as looping, branching, SQL operations, and variable management are defined
+  * The higher layer contains a declarative language that defines tables, columns, field mappings, and inter-table relationships. 
+  * The default behavior is to use the higher level declarative language to generate a script to perform required data manipulation and query operations.
+  * Where the declarative language is not sufficient, the metadata maintainer can define a script using the procedural language to implement the operations.
+
 ### DEFAULTING TABLE / COLUMN NAMES
 It is a pain for simple metadata to have to specify table and column information.  Propose:
 in the entityInfo datastore we can specify a default table

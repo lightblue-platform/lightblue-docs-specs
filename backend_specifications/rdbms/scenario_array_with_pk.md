@@ -177,40 +177,19 @@ VALUES (3,123456, 'three');
 
 ```
 [
-    {
-        "operation": "insert_row",
-        "table": "BASE",
-        "columns": [
-            "$non_null_fields"
-        ]
-    },
-    {
-        "foreach": {
-            "field": "arrayStringWithPk",
-            "elem": "$x",
+     {   "$set": "$tables.BASE", "var":"$document" },
+     {   "insert_row" : { "table":"BASE" } },
+     {   "foreach": {
+            "field": "$document.arrayStringWithPk",
+            "elem": "x",
             "do": [
-                {
-                    "operation": "select_row",
-                    "table": "dual",
-                    "columns": [
-                        "seq.next"
-                    ],
-                    "returning": {
-                        "column": 1,
-                        "field": "id"
-                    }
+                {  "select" : { "table": "dual",
+                                "project": [ { "clause":"seq.next", binding:[ "$document.id" ] } ]
+                              }
                 },
-                {
-                    "operation": "insert_row",
-                    "table": "ARRAY_STRING_WITH_PK",
-                    "columns": [
-                        "$not_null_columns",
-                        {
-                            "column": "base_id",
-                            "field": "$parent.id"
-                        }
-                    ]
-                }
+                {  "$set": "$tables.ARRAY_STRING_WITH_PK", "var":"x" },
+                {  "$set": "$tables.ARRAY_STRING_WITH_PK.base_id", "var":"$document.id" }
+                {  "insert_row" : { "table": "ARRAY_STRING_WITH_PK" } }
             ]
         }
     }
@@ -281,43 +260,24 @@ VALUES (4,123456, 'four');
 
 ```
 [
-    {
-        "operation": "update_row",
-        "table": "BASE",
-        "columns": [
-            "$modified_columns"
-        ]
-    },
-    {   "operation":"collection_update",
-        "field" : "arrayStringWithPk", 
-        "retrieval": { 
-            "operation":"select",
-            "join":"ARRAY_STRING_WITH_PK", 
-            "project" : [ "$all_columns", { "column": "base_id" } ],
-            "where" : { "q": "base_id=?", 
-                        "bindings": [ { "field":"$parent._id" } ] } 
-        },
-        "inserted_rows": { 
-                    "operation":"insert_row",
-                    "table": "ARRAY_STRING_WITH_PK", 
-                    "columns": [ {"field":"s"}, {"field":"id"},  
-                                 {"column":"base_id","field":"$parent._id"}]
-        },
-        "updated_rows": { 
-                    "operation":"update_row",
-                    "table": "ARRAY_STRING_WITH_PK", 
-                    "columns":["$modified_columns"],
-                    "where": {"q": "base_id=? and id=?",  
-                              "bindings":[{"field":"$parent._id"}, 
-                                          {"field":"id"}]} }
-        },
-        "deleted_rows": { 
-                    "operation":"delete_row",
-                    "table": "ARRAY_STRING_WITH_PK",
-                    "where": { "q": "base_id=? and id=?", 
-                               "bindings": [{"field":"$parent._id"},
-                                            {"field":"id"}]} 
-        } 
+    {   "$set": "$tables.BASE", "var":"$document" },
+    {   "update_row" : { "table": "BASE" } },
+    {   "collection_update" : {
+            "newcollection" : "$document.arrayStringWithPk",
+            "oldcollection":  "$olddocument.arrayStringWithPk",
+            "inserted_rows": [
+               { "$set": "$tables.ARRAY_STRING_WITH_PK", "var":"$row" },
+               { "$set": "$tables.ARRAY_STRING_WITH_PK.base_id", "var":"$document._id" },
+               { "insert_row" : { "table":"ARRAY_STRING_WITH_PK" } }
+            ],
+            "updated_rows": [
+               { "$set": "$tables.ARRAY_STRING_WITH_PK", "var":"$row" },
+               { "update_row" : { "table": "ARRAY_STRING_WITH_PK" } }
+            ]
+            "deleted_rows": { "delete_row" : { "table": "ARRAY_STRING_WITH_PK",
+                                               "where": { "clause": "id=?", 
+                                                  "bindings": [ "$row.id" ] } } }
+        }
      }
 ]
 ```
