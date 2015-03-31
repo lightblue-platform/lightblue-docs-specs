@@ -99,19 +99,19 @@ This can only be used as an R-value, and sets column value to 'v'.
 ```
 Sets the value of 'varName' to the given value, the value of the variable, or the result of the script. The 'value:[]' initializes the variable to an empty list.
 
- * $set operation can be used to assign values to the columns of a table, or to a document
+ * $map operation can be used to map values of the columns of a table to a document, or vice versa
 ```
-{ "$set": "$tables.MY_TABLE", "var":"$document" }
+{ "$map": { "dest":"$tables.MY_TABLE", "source":"$document" } }
 ```
 This operation sets the columns of MY_TABLE to the current values in $document based on the column mapping. Only those columns of 'MY_TABLE' that have a mapping in '$document' are initialized.
 
 ```
-{ "$set": "$document.obj", "var":"$tables.SOME_TABLE" }
+{ "$map": { "dest": "$document.obj", "source":"$tables.SOME_TABLE" } }
 ```
 This operation sets the contents of 'obj' to the column values of 'SOME_TABLE'. Only the fields in 'obj' that have a mapping for a column of 'SOME_TABLE' are initialized.
 
 ```
-{ "$null":"$document.obj" }
+{ "$null": { "var":"$document.obj" }}
 ```
 This operation sets all values of 'obj' to null.
 
