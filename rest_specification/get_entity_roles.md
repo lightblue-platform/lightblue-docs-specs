@@ -8,7 +8,7 @@ GET /metadata/{entityName}/{version}/roles
 ```
 ---
 
-Get all roles for given entity name and default version.  If entity doesn't have a default vesrion an error is returned.
+Get all roles for given entity name and default version.  If entity doesn't have a default version an error is returned.
 ```
 GET /metadata/{entityName}/roles
 ```
