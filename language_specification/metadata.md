@@ -59,8 +59,8 @@ Entity metadata are stored in a collection named "metadata". Format of metadata 
 ```javascript
     "enums": [
         {
-            "name": name of the enumeration,
-            "values": array of enum values
+            "name": "name of the enumeration",
+            "values": "array of enum values"
         }
     ]
 ```
@@ -70,9 +70,9 @@ Entity metadata are stored in a collection named "metadata". Format of metadata 
 ```javascript
     "datastore" : {
         "backend" : "mongo",
-        "datasource" : logical name for the datasource,
-        "database" : database name
-        "collection" : collection name
+        "datasource" : "logical name for the datasource",
+        "database" : "database name",
+        "collection" : "collection name"
     }
 ```
 
@@ -91,9 +91,9 @@ Entity metadata are stored in a collection named "metadata". Format of metadata 
 
 ```javascript
 "version" : {
-    "value": String,
+    "value": "String",
     "extendVersions": [ String, ... ],
-    "changelog": String
+    "changelog": "String"
 }
 ```
 
