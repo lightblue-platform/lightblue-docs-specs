@@ -45,6 +45,9 @@ Schema defines the tables used in the entity mapping. If there is only one table
             "tables": [
                 {
                    "table" : "my_default_table",
+                   "columns" : [
+                     { "column":"columnName" },
+                   ]
                     ...
                 },
                 ...

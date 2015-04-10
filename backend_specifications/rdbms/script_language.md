@@ -39,6 +39,15 @@ are the variables that are predefined for each operation.
 
 Variables are untyped. They get the type of the object they're assigned to. A new variable is created the first time a unique variable name is written.
 
+### Value types
+
+These are the value types that can be used in scripts:
+* Primitive types: Any java type, including date, String, etc. Accessing simple document 
+fields, column values yield values of these types.
+* LOBs: Arrays of bytes or characters.
+* Lists: Result sets, or Json arrays 
+* Maps: Json object nodes
+
 ## Column/Variable References
 
 ### Variable reference
@@ -68,36 +77,32 @@ This can only be used as an R-value, and sets column value to 'v'.
 
 ### Set variable value
 ```
-{ "$set": "varName", "var": "varName" }
-{ "$set": "varName", "value": value }
-{ "$set": "varName", "value": [] }
-{ "$set": "varName", "valueof" : script }
 {
     "$set": {
-        "variable": "varName1",
-        "value": { "variable": "varName2" }
+        "dest": "varName1",
+        "var": "varName2" 
     }
 }
 {
     "$set": {
-        "variable": "varName1",
+        "dest": "varName1",
         "value": value }
     }
 }
 {
     "$set": {
-        "variable": "varName1",
+        "dest": "varName1",
         "value": []
     }
 }
 {
     "$set": {
-        "variable": "varName1",
-        "value": <script>
+        "dest": "varName1",
+        "valueOf": <script>
     }
 }
 ```
-Sets the value of 'varName' to the given value, the value of the variable, or the result of the script. The 'value:[]' initializes the variable to an empty list.
+Sets the value of 'dest' to the given value, the value of the variable, or the result of the script. The 'value:[]' initializes the variable to an empty list.
 
  * $map operation can be used to map values of the columns of a table to a document, or vice versa
 ```
