@@ -46,7 +46,13 @@ Schema defines the tables used in the entity mapping. If there is only one table
                 {
                    "table" : "my_default_table",
                    "columns" : [
-                     { "column":"columnName" },
+                     { 
+                        "column":"columnName",
+                        "nativeType":"varchar2",
+                        "jdbcType" : "varchar",
+                        "readFilter" : "?",
+                        "writeFilter" : "?"
+                     },
                    ]
                     ...
                 },
@@ -56,6 +62,24 @@ Schema defines the tables used in the entity mapping. If there is only one table
     }
 }
 ```
+
+For columns, only the column name is mandatory. Native type and
+jdbcType can be specified when default behavior yields unexpected
+results. The default behavior is to use the Java native type of the
+values assigned to the colum, and let the JDBC driver manage type
+conversions. Custom dialects can override this behavior.
+
+ReadFilter and writeFilter are used to customize how a column is read
+or written. The clause must contain one '?'.
+
+* `writeFilter` - a function applied when writing data, takes one argument `?`
+    * for example: `"writeFilter": "to_upper(?)"`
+    * default value is '?'
+* `readFilter` - a function applied when reading data, takes one argument `?`
+    * for example: `"readFilter": "to_char(?, 'YYYYMMDD')"`
+    * default value is '?'
+
+
 
 ## primary key
 This defines the primary keys for each table used in the mapping. Primary keys can include columns that are not mapped in entity metadata. 
@@ -179,14 +203,7 @@ Each field should be mapped to a column in a table.  Each column can have a func
     * if not specified and `table` is not defined at root of schema metadata persistance must fail
 * `column` - the column in the table
     * if not specified the column is assumed to be the metadata field name
-* `writeFilter` - a function applied when writing data, takes one argument `?`
-    * for example: `"writeFilter": "to_upper(?)"`
-    * default value is '?'
-* `readFilter` - a function applied when reading data, takes one argument `?`
-    * for example: `"readFilter": "to_char(?, 'YYYYMMDD')"`
-    * default value is '?'
 
-The '?' denotes a bind value; the actual value of the field will replace '?' when statements are executed. Because of this, all read/write filters must contain exactly one '?'.
 
 Example:
 ```json
@@ -206,8 +223,6 @@ Example:
                 "rdbms": {
                     "table": "my_table",
                     "column": "my_something",
-                    "writeFilter": "to_upper(?)",
-                    "readFilter": "to_lower(?)"
                 }
             }
         }

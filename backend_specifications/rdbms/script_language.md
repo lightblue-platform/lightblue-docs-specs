@@ -39,6 +39,8 @@ are the variables that are predefined for each operation.
 
 Variables are untyped. They get the type of the object they're assigned to. A new variable is created the first time a unique variable name is written.
 
+Variable assignments work by value, not reference.
+
 ### Value types
 
 These are the value types that can be used in scripts:
@@ -130,77 +132,32 @@ The 'clause' is a string optionally containing value markers '?'. Each value in 
 
 ```
 binding := var |
-           { var:variable, "in": true, "out": true } |
-           { value: value }
+           { var:variable, "dir":"in"|"out"|"inout", "type":type } |
+           { value: value. "type":type }
 ```
-The optional 'out' attribute determines if the binding is an OUT binding. OUT bindings read value from the executed statement and sets the variable. By default all bindings are IN bindings.  If 'out' is set to `true` and 'in' is not specified, 'in' is defaulted to `false`.  To define an IN/OUT binding, both 'in' and 'out' must be explicitly set to `true`. A value binding cannot be an OUT binding.
+OUT bindings read value from the executed statement and sets the variable. By default all bindings are IN bindings.  A value binding cannot be an OUT binding. A 'type' is required for all OUT and INOUT bindings. Possible values are: http://docs.oracle.com/javase/7/docs/api/java/sql/Types.html
 
 ### Examples
 IN binding:
 ```
 {"clause": "?", "bindings:["$someVariable"]}
-{"clause": "?", "bindings:[{"var":"$someVariable","in":true"}]}
-{"clause": "?", "bindings:[{"var":"$someVariable","in":true","out":false}]}
+{"clause": "?", "bindings:[{"var":"$someVariable","dir":"in"}]}
+{"clause": "?", "bindings:[{"value":1}]}
 ```
 
 OUT binding:
 ```
-{"clause": "?", "bindings:[{"var":"$someVariable","out":true}]}
-{"clause": "?", "bindings:[{"var":"$someVariable","out":true,"in":false}]}
+{"clause": "?", "bindings:[{"var":"$someVariable","dir":"out"}]}
 ```
 
 IN/OUT binding:
 ```
-{"clause": "?", "bindings:[{"var":"$someVariable","out":true,"in":true}]}
+{"clause": "?", "bindings:[{"var":"$someVariable","dir":"inout"}]}
 ```
 
 VALUE binding:
 ```
 {"clause": "?", "bindings":[{"value":12345}]}
-```
-
-## Variable/Column lists
-SQL statements get a list of variables/columns to operate on. These lists can contain variable and/or column references:
-```
- columns: [ column-reference, variable-reference,... ]
-```
-A column reference directly identifies a column. For variable references, the column mapping of the document field is used. A non-document variable cannot be used for column lists.
-
-The following keywords can also be used:
-
-* $document.$non-null-fields is an array [ {var: varName } ] containing all non-null fields for the current table
-* $document.$all-fields is an array [ {var:varName} ] containing all the fields for the current table
-* $document.$all-modified-fields is an array [ {var:varName} ] containing all the modified fields for the current table
-
-### Examples
-All not null fields:
-```
-"columns": [ "$document.$non-null-fields" ]
-```
-
-All fields:
-```
-"columns": [ "$document.$all-fields" ]
-```
-
-All modified fields:
-```
-"columns": [ "$document.$all-modified-fields" ]
-```
-
-Specific columns:
-```
-"columns": [ "$tables.MY_TABLE.MY_COLUMN_1", "$tables.MY_TABLE.MY_COLUMN_2" ]
-```
-
-Specific fields:
-```
-"columns": [ "$documnet.myField1", "$documnet.myField2" ]
-```
-
-All modified fields plus a specific field and column:
-```
-"columns": [ "$document.$all-modified-fields", "$documnet.myField1", "$tables.MY_TABLE.MY_COLUMN_2" ]
 ```
 
 
@@ -209,20 +166,20 @@ All modified fields plus a specific field and column:
 ### foreach
 
 ```
-{ foreach : { field: <array field name>,
+{ foreach : { var: <array field name>,
               elem: <iteration temp variable name>,
               do:  <operation to perform> } }
 ```
 
 This should be used to iterate through the elements of an embedded array.
 
-  - field: The array field whose fields will be iterated
+  - var: The array field whose fields will be iterated
   - elem : This corresponds to the counter variable. At each iteration, elem points to the next array element.
   - do : Operations to perform for each iteration
 
 For instance:
 ```
-{ foreach : { field: "$document.arr", elem:x, do : { insert_row : { table : "$tables.mytable" } } } }
+{ foreach : { var: "$document.arr", elem:x, do : { insert_row : { table : "$tables.mytable" } } } }
 ```
 
 This will insert a row to 'mytable' for every element of arr. At each iteration, the variable 'x'
@@ -235,33 +192,56 @@ will contain an element of 'arr', and all non-null fields of 'x' will be inserte
 ```
 For instance:
 ```
-{ "conditional": { "test": { "empty":"var" }, "then": thenScript, "else": elseScript } }
+{ "conditional": { "test": { "isEmpty":"var" }, "then": thenScript, "else": elseScript } }
 ```
 If 'var' is empty, runs 'then' script, otherwise 'else' script. 'var' can be a resultset or an array field.
 
-TODO document what testScript can be!
+
+#### Tests
+
+```
+ { "isEmpty" : var }
+ { "isEmpty" : { "var": variable } }
+ { "isEmpty" : { "value" : value } }
+```
+
 
 ### SQL
 
 ```
-{ execute_sql: { clause: query, bindings: [ bindings...], resultBindings: [ bindings... ] } }
+{ sql: { clause: query, bindings: [ bindings...] } }
+{ sqlcall: { clause: query, bindings: [ bindings,...] } }
 ```
 
-Executes a SQL statement. `bindings` are IN or OUT parameters to the
-SQL statement. `resultBindings` are bindings to the columns of the
-result set of the operation, if it has a result set and that result
-set has at most one row. If the result has has more rows and
-resultBindings is used, an exception is thrown. Order of bindings and
-resultbindings are important, bindings order has to match the markers
-'?' and resultbindings order has to match the columns.
+Executes a SQL statement. 'sql' is used for all queries and update
+statements. sqlcall is used for calling stored procedures, or inline
+functions. `bindings` are IN or OUT parameters to the SQL
+statement. No OUT parameters are allowed for 'sql. If the statement is
+an update, insert, or delete statement, the return value is an integer
+with number of rows modified. If the statement is a query, the return
+value is a result set.
 
-For queries involving many results, assign the operation to a variable.
+For queries involving many results, assign the operation to a
+variable, and use 'apply_binding' within a for-each  to retrieve results.
+
+sqlcall returns null. sql may return a result set, or updated row
+count, depending on the type of clause.
+
+### apply_binding
+
+```
+{ apply_binding: { row: list, bindings: [bindings,...] } }
+```
+
+'row' is a list containing a row of data, where each column of the row
+is an element of the list. apply_binding copies each column of 'row' to the
+corresponding 'binding'. The variables in bindings are all assumed to be OUT variables.
 
 
 ### insert_row
 
 ```
-{ insert_row : { table : <tableName> } }
+{ insert_row : { table : "$tables.<tableName>" } }
 ```
 
 This procedure inserts a row to a table using the current values of the columns for $tables.tableName.
@@ -269,14 +249,14 @@ This procedure inserts a row to a table using the current values of the columns 
 ### update_row
 
 ```
-{ update_row : { table: <tableName?,
-                 columns : [ ... ],
+{ update_row : { table: "$tables.<tableName>",
+                 columns : [ "col1","col2",... ],
                  where : { sql-clause }
           }
 }
 ```
 * table: The table name to update a row
-* columns: Columns to be updated
+* columns: Columns to be updated. If omitted, all columns are updated
 * where: Defaults to a WHERE clause written by the identifiers of the entity for tableName.
 
 Can specify a WHERE clause (without the "WHERE") with bindings:
@@ -292,19 +272,6 @@ where: { clause:"id=? and active=?", bindings: [ $document.id, {value:true}] }
                }
 }
 ```
-
-### select
-
-```
-{ select : { project: [ var1, var2, {"clause": clause, bindings: [ ... ] }, ... ],
-             distinct: true|false,
-             join: { tables: [ { "alias": alias, "table": table, outer: false }, ... ], on: { clause: "criteria", bindings:[...] } } |
-             table: "table",
-             where: { clause: "criteria", bindings: [...] },
-             sort: [ { column: col, ascending: true}, { var: field, ascending: true}, ... ] }
-```
-
-Builds a select statement. The projected columns are derived from the projected variables. If custom clauses are used, those clauses should use the same aliases for the tables as they are defined in the join. The clauses should be used to project columns that are not mapped to a variable.
 
 ### update_collection 
 
