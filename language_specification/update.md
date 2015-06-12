@@ -8,7 +8,7 @@ primitive_update_expression := { $set : { path : rvalue_expression , ...} } |
                                { $unset : path } |
                                { $unset :[ path, ... ] }
                                { $add : { path : rvalue_expression, ... } }
-rvalue_expression := value | { $valueof : path } | {}
+rvalue_expression := value | { $valueof : path } | {} | []
 
 array_update_expression := { $append : { path : rvalue_expression } } |
                            { $append : { path : [ rvalue_expression, ... ] }} |
@@ -30,7 +30,9 @@ the first two elements of an array, use:
 ### Primitive updates
 ```javascript
      { "$set" : { "path" : value } }
-     { "$set" : { "path" : { "$valueof" : field } }
+     { "$set" : { "path" : [] } }
+      { "$set" : { "path" : {} } }
+    { "$set" : { "path" : { "$valueof" : field } }
      { "$unset" : "path" }  (array index is supported, can be used to
                            remove elements of array)
      { "$add" : { "path" : number } }
@@ -43,6 +45,8 @@ the first two elements of an array, use:
                       objects (extend array with a  new element)
 
      { "$append" : { "pathToArray" : value } }
+
+     { "$append" : { "pathToArray" : {} } }
 
      { "$insert" : { "pathToArray.n" : [ values ] } }
      { "$insert" : { "pathToArray.n" : value } } (index (n) can be negative)
