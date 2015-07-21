@@ -3,10 +3,10 @@
 A simplified find API that takes just query parameters to do a simple search.
 
 ```
-GET /data/{entity}?Q&P&S&R
+GET /data/find/{entity}?Q&P&S&R
 ```
 ```
-GET /data/{entity}/{version}?Q&P&S&R
+GET /data/find/{entity}/{version}?Q&P&S&R
 ```
 
 where Q represents the query, P represents the projection, S represents the sort expressions, and R is the range.
