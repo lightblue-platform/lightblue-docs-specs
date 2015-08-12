@@ -3,10 +3,10 @@ Create a new schema, representing a new version of an existing entity.
 
 ### Request
 Two path params on the request representing the entity name and version.
-Body of request is a JSON document matching the [schema JSON-schema](https://raw.github.com/lightblue-platform/lightblue-core/master/metadata/src/main/resources/json-schema/metadata/schema.json)
+Body of request is a JSON document matching the [schema JSON-schema](https://raw.github.com/lightblue-platform/lightblue-core/master/metadata/src/main/resources/json-schema/metadata/schema.json) or metadata  [metadata JSON-schema](https://raw.github.com/lightblue-platform/lightblue-core/master/metadata/src/main/resources/json-schema/metadata/metadata.json)
 ```
 PUT /metadata/{entityName}/schema={version}
-{schema JSON document}
+{schema or metadata JSON document}
 ```
 
 ### Response: Success
