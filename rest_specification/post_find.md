@@ -22,7 +22,6 @@ On success returns a [response JSON document](https://raw.githubusercontent.com/
 
 ### Response: Errors
 * crud:NoAccess - caller doesn't have access required to save the document
-* mongo-crud:NullQuery - query in request is missing
 * mongo-crud:NullProjection - projection in request is missing
 
 ### Example: find country

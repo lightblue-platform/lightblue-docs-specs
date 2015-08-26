@@ -153,7 +153,7 @@ Request object:
   "range": [ from, to ]
 }
 ```
-* query: A non-empty query expression
+* query: A query expression, or null to return everything
 * projection: A non-empty projection expression specifying what to return
 * sort: Optional sort specification
 * range: Optional range, inclusive range of results to return.
