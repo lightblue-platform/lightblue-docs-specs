@@ -13,7 +13,7 @@ identifier is a logical identifier to the resource to be locked. The
 caller identifier is a string uniquely identifying the caller.
 
 ```
-DELETE /data/lock/{domain}/{resourceId}/{callerId}
+DELETE /data/lock/{domain}/{callerId}/{resourceId}
 ```
 
 ### Response: Success

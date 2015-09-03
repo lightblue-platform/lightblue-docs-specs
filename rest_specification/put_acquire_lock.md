@@ -14,7 +14,7 @@ optional, and gives the expiration duration for the lock in
 milliseconds.
 
 ```
-PUT /data/lock/{domain}/{resourceId}/{callerId}?ttl=<ttl>
+PUT /data/lock/{domain}/{callerId}/{resourceId}?ttl=<ttl>
 ```
 
 ### Response: Success

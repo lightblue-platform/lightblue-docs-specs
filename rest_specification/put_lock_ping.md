@@ -12,7 +12,7 @@ identifier is a logical identifier to the resource to be locked. The
 caller identifier is a string uniquely identifying the caller.
 
 ```
-PUT /data/lock/{domain}/{resourceId}/{callerId}/ping
+PUT /data/lock/{domain}/{callerId}/{resourceId}/ping
 ```
 
 ### Response: Success
