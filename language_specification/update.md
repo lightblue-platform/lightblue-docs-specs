@@ -8,7 +8,9 @@ primitive_update_expression := { $set : { path : rvalue_expression , ...} } |
                                { $unset : path } |
                                { $unset :[ path, ... ] }
                                { $add : { path : rvalue_expression, ... } }
-rvalue_expression := value | { $valueof : path } | {} | []
+rvalue_expression := value | { $valueof : path }
+value := primitive_value | json_container
+json_container := jsonObjectNode | jsonArrayNode
 
 array_update_expression := { $append : { path : rvalue_expression } } |
                            { $append : { path : [ rvalue_expression, ... ] }} |
@@ -30,8 +32,8 @@ the first two elements of an array, use:
 ### Primitive updates
 ```javascript
      { "$set" : { "path" : value } }
-     { "$set" : { "path" : [] } }
-      { "$set" : { "path" : {} } }
+     { "$set" : { "path" : [...] } }
+      { "$set" : { "path" : { ... } } }
     { "$set" : { "path" : { "$valueof" : field } }
      { "$unset" : "path" }  (array index is supported, can be used to
                            remove elements of array)
@@ -47,7 +49,8 @@ the first two elements of an array, use:
      { "$append" : { "pathToArray" : value } }
 
      { "$append" : { "pathToArray" : {} } }
-
+     { "$append" : { "pathToArray" : { "field1":"x", "field2":"y"} } }
+     
      { "$insert" : { "pathToArray.n" : [ values ] } }
      { "$insert" : { "pathToArray.n" : value } } (index (n) can be negative)
 ```
@@ -67,6 +70,11 @@ Using this, it is possible to append and initialize object array elements.
 Above example first appends an empty object to the field "someArray", then sets
 values in that element. The index -1 refers to the newly added element.
 
+As of 1.8.0, it is possible to update arrays using objects:
+
+```javascript
+   { "$append" : { "someArray" : { "someValue" : 1, "otherValue": "value" } } }
+```
 
 ### Updating array elements:
 ```javascript
