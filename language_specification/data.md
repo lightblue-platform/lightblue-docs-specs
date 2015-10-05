@@ -150,14 +150,19 @@ Request object:
   "query": query_expression,
   "projection": projection,
   "sort": sort,
-  "range": [ from, to ]
+  "range": [ from, to ],
+  "from": from,
+  "to": to
 }
 ```
 * query: A query expression, or null to return everything
 * projection: A non-empty projection expression specifying what to return
 * sort: Optional sort specification
 * range: Optional range, inclusive range of results to return.
-  If sort is not given, the results will be returned in an
-  unspecified order, making range useless. There is no guarantee
-  that subsequent calls will retrieve the results in the same order.
+* from: Optional beginning of a range, use only if 'range' is omitted.
+* to: Optional end of a range, use only if 'range' is omitted.
+
+If sort is not given, the results will be returned in an
+unspecified order, making range useless. There is no guarantee
+that subsequent calls will retrieve the results in the same order.
 
