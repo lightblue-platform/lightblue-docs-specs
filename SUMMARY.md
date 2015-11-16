@@ -33,6 +33,7 @@
        * [Find (Simple)](rest_specification/get_find_simple.md)
        * [Find (Complex)](rest_specification/post_find.md)
        * [Delete Data](rest_specification/post_delete_data.md)
+       * [Bulk request](rest_specification/bulk_request.md)
    * [Locking](rest_specification/locking.md)
        * [Acquire](rest_specification/put_acquire_lock.md)
        * [Release](rest_specification/delete_release_lock.md)
