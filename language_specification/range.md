@@ -65,3 +65,11 @@ Get all records skipping the first 100:
 Deprecated in favor of `from` and `to` / `maxResults`.
 
 The value of `range` is an array with two integer values and is optional.  Values in the array are a zero based index of the sorted output from lightblue.  The first element in the array is set as the `from` value and the second element is `to`.  See "from, to" above.
+
+Example to find first 5 records:
+```javascript
+{
+    ...
+    "range": [0,4]
+}
+```
