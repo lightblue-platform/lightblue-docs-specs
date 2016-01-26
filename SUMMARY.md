@@ -9,6 +9,7 @@
            * [Field Comparisons with Arrays](language_specification/field_comparisons_with_arrays.md)
        * [Projection](language_specification/projection.md)
        * [Sort](language_specification/sort.md)
+       * [Range](language_specification/range.md)
        * [Update](language_specification/update.md)
    * [Error](language_specification/error.md)
 * [REST Specification](rest_specification/README.md)
