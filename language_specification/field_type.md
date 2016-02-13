@@ -1,11 +1,11 @@
-# type
+# simple field
 There are three types of `type` values:
 * simple
-    * bigdecimal, biginteger, boolean, binary, date, double, integer, string
+    * `bigdecimal`, `biginteger`, `boolean`, `binary`, `date`, `double`, `integer`, `string`
 * container
-    * array, object
+    * `array`, `object`
 * reference
-    * reference
+    * `reference`
 
 This section is focusing on the simple types.
 
