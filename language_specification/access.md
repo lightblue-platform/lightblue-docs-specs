@@ -1,4 +1,4 @@
-# access
+# entity access
 Entity access definitions. Determines the access rights at an entity level.
 
 ```javascript
