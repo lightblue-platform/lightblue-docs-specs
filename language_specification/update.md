@@ -50,7 +50,7 @@ the first two elements of an array, use:
 
      { "$append" : { "pathToArray" : {} } }
      { "$append" : { "pathToArray" : { "field1":"x", "field2":"y"} } }
-     
+
      { "$insert" : { "pathToArray.n" : [ values ] } }
      { "$insert" : { "pathToArray.n" : value } } (index (n) can be negative)
 ```
