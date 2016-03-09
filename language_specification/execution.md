@@ -1,5 +1,5 @@
 # Execution
-Execution options are open in each request.  This section describes the supported operations for core and each individual controller implementation.
+Execution options are open-ended for each request, accepting any valid key/value pairs..  This section describes the supported keys for core and each individual controller implementation.  Unsupported keys are ignored.
 
 ## Core
 None at this time.
