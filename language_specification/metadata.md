@@ -44,12 +44,14 @@ Entity metadata are stored in a collection named "metadata". Format of metadata 
     ]
 ```
    *  `indexes`: array of index information.  Each index is an array of fields to index
+     *  Read about case insensitive caveats [here](http://docs.lightblue.io/cookbook/case_insensitive_indexes.html)
 
 ```javascript
     "indexes": [
         {
             "name": optional name of the index,
             "unique": flag to indicate if index is a unique constraint.  if not specified defaults to 'false',
+            "caseInsensitive": flag to indicate if the index shall be case insensitive.  if not specified defaults to 'false',
             "fields": [ { "field":"fieldName", "dir":"$asc" },  ... ] Array with fields (paths) that are part of the index
         }
     ]
