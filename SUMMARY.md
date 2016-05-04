@@ -50,6 +50,7 @@
        * [Find (Complex)](rest_specification/post_find.md)
        * [Delete Data](rest_specification/post_delete_data.md)
        * [Bulk request](rest_specification/bulk_request.md)
+       * [Generate value](rest_specification/get_generate_value.md)
    * [Locking](rest_specification/locking.md)
        * [Acquire](rest_specification/put_acquire_lock.md)
        * [Release](rest_specification/delete_release_lock.md)
