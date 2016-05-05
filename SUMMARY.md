@@ -42,6 +42,7 @@
        * [Delete Default Version for Entity](rest_specification/delete_clear_default_version_for_entity.md)
        * [Update Default Version for Entity](rest_specification/post_set_default_version_for_entity.md)
        * [Delete Entity](rest_specification/delete_remove_entity.md)
+       * [Reindex Hidden Fields](rest_specification/reindex.md)
    * [Data](rest_specification/data.md)
        * [Insert New Data](rest_specification/put_insert_new_data.md)
        * [Save Existing Entity](rest_specification/post_save_existing_entity.md)
