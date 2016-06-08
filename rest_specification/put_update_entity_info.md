@@ -17,3 +17,54 @@ Additional error codes:
 * metadata:NoEntityName - no entity name specified
 * rest-metadata:NoNameMatch - entity name on the path does not match entity name in the json document
 * metadata:MissingEntityInfo - entity info does not exist and therefore cannot be updated
+
+### Sample Request
+This example ensures there's an index on sandwich toppings, and a notification hook that creates events when the toppings field is updated.
+```
+PUT /metadata/sandwich
+{
+    "datastore": {
+        "backend": "mongo",
+        "collection": "sandwich",
+        "datasource": "mongodata"
+    },
+    "defaultVersion": "0.0.66",
+    "indexes": [
+        {
+            "fields": [
+                {
+                    "dir": "$asc",
+                    "field": "sandwichNumber"
+                }
+            ],
+            "name": "sandwich_sandwichNumber",
+            "unique": true
+        },
+    ],
+    "hooks": [
+      {
+        "name": "toppingNotificationHook",
+        "actions": [
+          "insert",
+          "update"
+        ],
+        "configuration": {
+          "watchProjection":[
+            {
+              "field":"_id",
+              "include":true,
+              "recursive":false
+            },
+            {
+              "field":"toppings",
+              "include":true,
+              "recursive":false
+            }
+          ],
+          "includeProjection":[ ],
+          "arrayOrderingSignificant":false
+        }
+    } ],
+    "name": "sandwich"
+}
+```
