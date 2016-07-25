@@ -49,6 +49,7 @@
        * [POST: Update Existing Entity](rest_specification/post_update_existing_entity.md)
        * [Find (Simple)](rest_specification/get_find_simple.md)
        * [Find (Complex)](rest_specification/post_find.md)
+       * [Find Explain Plan](rest_specification/post_explain.md)
        * [Delete Data](rest_specification/post_delete_data.md)
        * [Bulk request](rest_specification/bulk_request.md)
        * [Generate value](rest_specification/get_generate_value.md)
