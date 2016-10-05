@@ -8,7 +8,7 @@ Schemas for the mongo backend are managed by lightblue.  Therefore it's importan
 | --------- | ----- | ----- |
 | binary    | String| encoding handled by clients|
 | boolean   | Boolean | |
-| date      |String| format: YYYYMMDD HHmmssSSSS+-ZZZZ|
+| date      |String| format: YYYYMMDDTHH:mm:ss.SSS+-ZZZZ (note T is a literal string)|
 | integer   | 64-bit integer | |
 | double    | Double | |
 | biginteger| String | operators < and > not allowed during search |
