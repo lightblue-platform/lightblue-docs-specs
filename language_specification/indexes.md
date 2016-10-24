@@ -1,7 +1,7 @@
 # indexes
 Each index is an array of fields to index.
 
-```javascript
+```json
 "indexes": [
     {
         "fields": [
@@ -13,7 +13,8 @@ Each index is an array of fields to index.
             ...
         ],
         "name": "indexName",
-        "unique": true
+        "unique": true,
+        "partialFilterExpression": {"field": {"$gt": 5}}
     },
     ...
 ]
@@ -26,3 +27,4 @@ Each index is an array of fields to index.
         * There are pros and cons to consider when using this flag.  Please read the [user docs](http://docs.lightblue.io/cookbook/case_insensitive_indexes.html) before using them. 
 * `name`: Name of the index.  Default set based on controller implementation. [optional]
 * `unique`: Flag to indicate if index is a unique constraint.  Defaults to `false`. [optional]
+* `partialFilterExpression`: Mongo query used to define partial index. This is specific to Mongo. [optional]
