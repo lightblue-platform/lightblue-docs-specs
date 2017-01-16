@@ -1,4 +1,4 @@
-# reference field
+# any field
 There are four types of `type` values:
 * simple
     * `bigdecimal`, `biginteger`, `boolean`, `binary`, `date`, `double`, `integer`, `string`
