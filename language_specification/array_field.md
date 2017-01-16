@@ -1,11 +1,13 @@
 # reference field
-There are three types of `type` values:
+There are four types of `type` values:
 * simple
     * `bigdecimal`, `biginteger`, `boolean`, `binary`, `date`, `double`, `integer`, `string`
 * container
     * `array`, `object`
 * reference
     * `reference`
+* free-form
+    * `any`
 
 This section is focusing on the reference type.
 

@@ -6,6 +6,8 @@ There are three types of `type` values:
     * `array`, `object`
 * reference
     * `reference`
+* free-form
+    * `any`
 
 This section is focusing on the simple types.
 
