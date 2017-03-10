@@ -56,6 +56,11 @@ POST /data/find/country/1.0.0
 {
     "status": "complete",
     "matchCount": 1,
+    "resultMetadata": [
+        {
+            "documentVersion":"123456"
+        }
+    ],
     "processed": [
         {
             "name": "United States of America",
